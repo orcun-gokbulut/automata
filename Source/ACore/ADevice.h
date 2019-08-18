@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DataPoint.h"
+#include "ADataPoint.h"
 
 #include <string>
 #include <vector>

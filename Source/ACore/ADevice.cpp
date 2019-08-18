@@ -1,6 +1,6 @@
-#include "Device.h"
+#include "ADevice.h"
 
-#include "Common/Error.h"
+#include "ACommon/AError.h"
 
 void ADevice::SetSerialNumber(uint32 number)
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common/Types.h"
-#include "Core/Address.h"
+#include "ACommon/ATypes.h"
+#include "ACore/AAddress.h"
 
 #include <string>
 

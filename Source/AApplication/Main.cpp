@@ -1,5 +1,5 @@
-#include "Core/Address.h"
-#include "Core/Telegram.h"
+#include "ACore/AAddress.h"
+#include "ACore/ATelegram.h"
 
 #include <string.h>
 

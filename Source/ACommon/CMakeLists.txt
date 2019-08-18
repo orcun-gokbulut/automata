@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.1)
 
 set(Sources
-	Types.h
-	Types.cpp
-	Error.h
-	Error.cpp)
+	ATypes.h
+	ATypes.cpp
+	AError.h
+	AError.cpp)
 
-add_library(Common ${Sources})
+add_library(ACommon ${Sources})
 source_group("" FILES ${Sources})

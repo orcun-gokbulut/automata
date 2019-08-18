@@ -1,27 +1,27 @@
-#include "Error.h"
+#include "AError.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
-void Console::Output(OutputType Type, const char* Module, const char* Message, ...)
+void AConsole::Output(AOutputType Type, const char* Module, const char* Message, ...)
 {
 	switch(Type)
 	{
-		case OutputType::CriticalError:
+		case AOutputType::CriticalError:
 			printf("[%s] CRITICAL ERROR: ", Module);
 			break;
 
-		case OutputType::Error:
+		case AOutputType::Error:
 			printf("[%s] Error: ", Module);
 			break;
 
-		case OutputType::Warning:
+		case AOutputType::Warning:
 			printf("[%s] Warning: ", Module);
 			break;
 
 		default:
-		case OutputType::Log:
+		case AOutputType::Log:
 			printf("[%s] Log: ", Module);
 			break;
 	}
@@ -34,7 +34,7 @@ void Console::Output(OutputType Type, const char* Module, const char* Message, .
 	printf("\n");
 }
 
-void Console::Abort()
+void AConsole::Abort()
 {
 	abort();
 }

@@ -1,7 +1,7 @@
-#include "Telegram.h"
+#include "ATelegram.h"
 
-#include "TelegramPacket.h"
-#include "Common/Error.h"
+#include "ATelegramPacket.h"
+#include "ACommon/AError.h"
 
 void ATelegram::SetPriority(ATelegramPriority priority)
 {
@@ -75,7 +75,7 @@ uint8 ATelegram::GetFirstPayload() const
 
 void ATelegram::SetPayload(const void* data, size_t size)
 {
-	CheckError(size > TELEGRAM_MAX_PAYLOAD_SIZE, RETURN_VOID, "Cannot set payload. Payload is too big.");
+	CheckError(size > A_TELEGRAM_MAX_PAYLOAD_SIZE, RETURN_VOID, "Cannot set payload. Payload is too big.");
 
 	payload.resize(size);
 	memcpy(payload.begin()._Ptr, data, size);
@@ -93,7 +93,7 @@ size_t ATelegram::GetPayloadSize() const
 
 void ATelegram::Generate(void* buffer, size_t& size) const
 {
-	OHTelegramPacket* packet = (OHTelegramPacket*)buffer;
+	ATelegramPacket* packet = (ATelegramPacket*)buffer;
 	packet->control.frameFormat = (uint8)ATelegramFrameFormat::Standard;
 	packet->control.reserved0 = 0x01;
 	packet->control.repeadFlag = GetRepeatFlag();
@@ -108,9 +108,9 @@ void ATelegram::Generate(void* buffer, size_t& size) const
 
 	uint8* bytes = (uint8*)buffer;
 	if (payload.size() != 0)
-		memcpy(bytes + TELEGRAM_PAYLOAD_OFFSET, payload.begin()._Ptr, payload.size());
+		memcpy(bytes + A_TELEGRAM_PAYLOAD_OFFSET, payload.begin()._Ptr, payload.size());
 
-	size = TELEGRAM_PAYLOAD_OFFSET + GetPayloadSize();
+	size = A_TELEGRAM_PAYLOAD_OFFSET + GetPayloadSize();
 	uint8 checkSum = 0;
 	for (uint8 I = 0; I < size; I++)
 		checkSum ^= bytes[I];
@@ -121,10 +121,10 @@ void ATelegram::Generate(void* buffer, size_t& size) const
 
 bool ATelegram::Process(const void* buffer, size_t size)
 {
-	CheckError(size < TELEGRAM_MIN_SIZE, false, "Process telegram failed. Telegram size is too small.");
+	CheckError(size < A_TELEGRAM_MIN_SIZE, false, "Process telegram failed. Telegram size is too small.");
 		
-	OHTelegramPacket* packet = (OHTelegramPacket*)buffer;
-	uint8 packetSize = packet->routing.payloadLenght + TELEGRAM_MIN_SIZE;
+	ATelegramPacket* packet = (ATelegramPacket*)buffer;
+	uint8 packetSize = packet->routing.payloadLenght + A_TELEGRAM_MIN_SIZE;
 	CheckError(packetSize != size, false, "Process telegram failed. Telegram payload size is wrong.");
 	CheckError(packet->control.frameFormat != (uint8)ATelegramFrameFormat::Standard, false, "Process telegram failed. Only standard format telegrams are supported.");
 	CheckWarning(packet->control.reserved0 != true || packet->control.reserved1 != 0x00, "Control field unused fields default values are incorrect.");
@@ -141,7 +141,7 @@ bool ATelegram::Process(const void* buffer, size_t size)
 	SetCommand((ATelegramCommand)packet->command.command);
 	SetFirstPayload(packet->command.payload);
 	SetAddressType((ATelegramAddressType)packet->routing.destinationAddressType);
-	SetPayload(bytes + TELEGRAM_PAYLOAD_OFFSET, packet->routing.payloadLenght);
+	SetPayload(bytes + A_TELEGRAM_PAYLOAD_OFFSET, packet->routing.payloadLenght);
 
 	return true;
 }
