@@ -7,13 +7,13 @@
 
 using namespace std;
 
-class OHDevice
+class ADevice
 {
 	private:
 		uint32								serialNumber;
 		string								name;
 
-		std::vector<OHDataPoint*>			dataPoints;
+		std::vector<ADataPoint*>			dataPoints;
 
 	public:
 		void								SetSerialNumber(uint32 number);
@@ -22,12 +22,12 @@ class OHDevice
 		void								SetName(const string& name);
 		const string						GetName() const;
 
-		const std::vector<OHDataPoint*>&	GetDataPoints() const;
-		void								AddDataPoint(OHDataPoint* dataPoint);
-		void								RemoveDataPoint(OHDataPoint* dataPoint);
+		const std::vector<ADataPoint*>&		GetDataPoints() const;
+		void								AddDataPoint(ADataPoint* dataPoint);
+		void								RemoveDataPoint(ADataPoint* dataPoint);
 
 		virtual void						Process();
 
-											OHDevice();
-		virtual								~OHDevice();
+											ADevice();
+		virtual								~ADevice();
 };

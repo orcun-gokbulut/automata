@@ -1,14 +1,14 @@
 #include "Address.h"
 
-#define TELEGRAM_MAX_PAYLOAD_SIZE 14
-#define TELEGRAM_MIN_SIZE 9
-#define TELEGRAM_PAYLOAD_OFFSET 8
+#define A_TELEGRAM_MAX_PAYLOAD_SIZE 14
+#define A_TELEGRAM_MIN_SIZE 9
+#define A_TELEGRAM_PAYLOAD_OFFSET 8
 
 
 #pragma pack(push)
 #pragma pack(1)
 
-struct OHTelegramControlField
+struct ATelegramControlField
 {
 	uint8					frameFormat : 2;
 	bool					repeadFlag : 1;
@@ -17,27 +17,27 @@ struct OHTelegramControlField
 	uint8					reserved1 : 2;
 };
 
-struct OHTelegramRoutingField
+struct ATelegramRoutingField
 {
 	uint8					destinationAddressType : 1;
 	uint8					counter : 3;
 	uint8					payloadLenght : 4;
 };
 
-struct OHTelegramCommandField
+struct ATelegramCommandField
 {
 	uint8					Reserved : 2;
 	uint8					command : 4;
 	uint8					payload : 6;
 };
 
-struct OHTelegramPacket
+struct ATelegramPacket
 {
-	OHTelegramControlField	control;
+	ATelegramControlField	control;
 	uint16					source;
 	uint16					destination;
-	OHTelegramRoutingField	routing;
-	OHTelegramCommandField	command;
+	ATelegramRoutingField	routing;
+	ATelegramCommandField	command;
 };
 
 #pragma pack(pop)

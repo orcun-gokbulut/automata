@@ -3,77 +3,77 @@
 #include "TelegramPacket.h"
 #include "Common/Error.h"
 
-void OHTelegram::SetPriority(OHTelegramPriority priority)
+void ATelegram::SetPriority(ATelegramPriority priority)
 {
 	this->priority = priority;
 }
 
-OHTelegramPriority OHTelegram::GetPriority() const
+ATelegramPriority ATelegram::GetPriority() const
 {
 	return priority;
 }
 
-void OHTelegram::SetAddressType(OHTelegramAddressType type)
+void ATelegram::SetAddressType(ATelegramAddressType type)
 {
 	addressType = type;
 }
 
-OHTelegramAddressType OHTelegram::GetAddressType() const
+ATelegramAddressType ATelegram::GetAddressType() const
 {
 	return addressType;
 }
 
-void OHTelegram::SetSource(const OHAddress& address)
+void ATelegram::SetSource(const AAddress& address)
 {
 	source = address;
 }
 
-const OHAddress& OHTelegram::GetSource() const
+const AAddress& ATelegram::GetSource() const
 {
 	return source;
 }
 
-void OHTelegram::SetDestination(const OHAddress& address)
+void ATelegram::SetDestination(const AAddress& address)
 {
 	destination = address;
 }
 
-const OHAddress& OHTelegram::GetDestination() const
+const AAddress& ATelegram::GetDestination() const
 {
 	return destination;
 }
 
-void OHTelegram::SetRepeatFlag(bool flag)
+void ATelegram::SetRepeatFlag(bool flag)
 {
 	repeatFlag = flag;
 }
 
-bool OHTelegram::GetRepeatFlag() const
+bool ATelegram::GetRepeatFlag() const
 {
 	return repeatFlag;
 }
 
-void OHTelegram::SetCommand(OHTelegramCommand command)
+void ATelegram::SetCommand(ATelegramCommand command)
 {
 	this->command = command;
 }
 
-OHTelegramCommand OHTelegram::GetCommand() const
+ATelegramCommand ATelegram::GetCommand() const
 {
 	return command;
 }
 
-void OHTelegram::SetFirstPayload(uint8 value)
+void ATelegram::SetFirstPayload(uint8 value)
 {
 	firstPayload = value;
 }
 
-uint8 OHTelegram::GetFirstPayload() const
+uint8 ATelegram::GetFirstPayload() const
 {
 	return firstPayload;
 }
 
-void OHTelegram::SetPayload(const void* data, size_t size)
+void ATelegram::SetPayload(const void* data, size_t size)
 {
 	CheckError(size > TELEGRAM_MAX_PAYLOAD_SIZE, RETURN_VOID, "Cannot set payload. Payload is too big.");
 
@@ -81,20 +81,20 @@ void OHTelegram::SetPayload(const void* data, size_t size)
 	memcpy(payload.begin()._Ptr, data, size);
 }
 
-const void* OHTelegram::GetPayload() const
+const void* ATelegram::GetPayload() const
 {
 	return payload.begin()._Ptr;
 }
 
-size_t OHTelegram::GetPayloadSize() const
+size_t ATelegram::GetPayloadSize() const
 {
 	return payload.size();
 }
 
-void OHTelegram::Generate(void* buffer, size_t& size) const
+void ATelegram::Generate(void* buffer, size_t& size) const
 {
 	OHTelegramPacket* packet = (OHTelegramPacket*)buffer;
-	packet->control.frameFormat = (uint8)OHTelegramFrameFormat::Standard;
+	packet->control.frameFormat = (uint8)ATelegramFrameFormat::Standard;
 	packet->control.reserved0 = 0x01;
 	packet->control.repeadFlag = GetRepeatFlag();
 	packet->control.reserved1 = 0x00;
@@ -119,14 +119,14 @@ void OHTelegram::Generate(void* buffer, size_t& size) const
 	size++;
 }
 
-bool OHTelegram::Process(const void* buffer, size_t size)
+bool ATelegram::Process(const void* buffer, size_t size)
 {
 	CheckError(size < TELEGRAM_MIN_SIZE, false, "Process telegram failed. Telegram size is too small.");
 		
 	OHTelegramPacket* packet = (OHTelegramPacket*)buffer;
 	uint8 packetSize = packet->routing.payloadLenght + TELEGRAM_MIN_SIZE;
 	CheckError(packetSize != size, false, "Process telegram failed. Telegram payload size is wrong.");
-	CheckError(packet->control.frameFormat != (uint8)OHTelegramFrameFormat::Standard, false, "Process telegram failed. Only standard format telegrams are supported.");
+	CheckError(packet->control.frameFormat != (uint8)ATelegramFrameFormat::Standard, false, "Process telegram failed. Only standard format telegrams are supported.");
 	CheckWarning(packet->control.reserved0 != true || packet->control.reserved1 != 0x00, "Control field unused fields default values are incorrect.");
 
 	uint8* bytes = (uint8*)buffer;
@@ -138,19 +138,19 @@ bool OHTelegram::Process(const void* buffer, size_t size)
 	SetRepeatFlag(packet->control.repeadFlag);
 	SetSource(packet->source);
 	SetDestination(packet->destination);
-	SetCommand((OHTelegramCommand)packet->command.command);
+	SetCommand((ATelegramCommand)packet->command.command);
 	SetFirstPayload(packet->command.payload);
-	SetAddressType((OHTelegramAddressType)packet->routing.destinationAddressType);
+	SetAddressType((ATelegramAddressType)packet->routing.destinationAddressType);
 	SetPayload(bytes + TELEGRAM_PAYLOAD_OFFSET, packet->routing.payloadLenght);
 
 	return true;
 }
 
-OHTelegram::OHTelegram()
+ATelegram::ATelegram()
 {
 	repeatFlag = false;
-	priority = OHTelegramPriority::Normal;
-	addressType = OHTelegramAddressType::GroupAddress;
-	command = OHTelegramCommand::ValueWrite;
+	priority = ATelegramPriority::Normal;
+	addressType = ATelegramAddressType::GroupAddress;
+	command = ATelegramCommand::ValueWrite;
 	firstPayload = 0;
 }

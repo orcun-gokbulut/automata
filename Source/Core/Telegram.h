@@ -4,14 +4,14 @@
 
 #include <vector>
 
-enum class OHTelegramFrameFormat : uint8
+enum class ATelegramFrameFormat : uint8
 {
 	Standard = 2,
 	Extended = 1,
 	Poll = 3,
 };
 
-enum class OHTelegramPriority : uint8
+enum class ATelegramPriority : uint8
 {
 	System = 0,
 	High = 1,
@@ -19,13 +19,13 @@ enum class OHTelegramPriority : uint8
 	Normal = 3
 };
 
-enum class OHTelegramAddressType : uint8
+enum class ATelegramAddressType : uint8
 {
 	IndividualAddress = 0,
 	GroupAddress = 1
 };
 
-enum class OHTelegramCommand : uint8
+enum class ATelegramCommand : uint8
 {
 	ValueRead = 0,
 	ValueResponse = 1,
@@ -33,36 +33,36 @@ enum class OHTelegramCommand : uint8
 	MemoryWrite = 10
 };
 
-class OHTelegram
+class ATelegram
 {
 	private:
 		bool						repeatFlag;
-		OHTelegramPriority			priority;
-		OHTelegramAddressType		addressType;
-		OHAddress					source;
-		OHAddress					destination;
-		OHTelegramCommand			command;
+		ATelegramPriority			priority;
+		ATelegramAddressType		addressType;
+		AAddress					source;
+		AAddress					destination;
+		ATelegramCommand			command;
 		uint8						firstPayload;
 		std::vector<uint8>			payload;
 
 	public:
-		void						SetPriority(OHTelegramPriority priority);
-		OHTelegramPriority			GetPriority() const;
+		void						SetPriority(ATelegramPriority priority);
+		ATelegramPriority			GetPriority() const;
 
-		void						SetAddressType(OHTelegramAddressType type);
-		OHTelegramAddressType		GetAddressType() const;
+		void						SetAddressType(ATelegramAddressType type);
+		ATelegramAddressType		GetAddressType() const;
 
-		void						SetSource(const OHAddress& address);
-		const OHAddress&			GetSource() const;
+		void						SetSource(const AAddress& address);
+		const AAddress&				GetSource() const;
 
-		void						SetDestination(const OHAddress& address);
-		const OHAddress&			GetDestination() const;
+		void						SetDestination(const AAddress& address);
+		const AAddress&				GetDestination() const;
 
 		void						SetRepeatFlag(bool flag);
 		bool						GetRepeatFlag() const;
 
-		void						SetCommand(OHTelegramCommand command);
-		OHTelegramCommand			GetCommand() const;
+		void						SetCommand(ATelegramCommand command);
+		ATelegramCommand			GetCommand() const;
 
 		void						SetFirstPayload(uint8 value);
 		uint8						GetFirstPayload() const;
@@ -74,5 +74,5 @@ class OHTelegram
 		void						Generate(void* buffer, size_t& size) const;
 		bool						Process(const void* buffer, size_t size);
 
-									OHTelegram();
+									ATelegram();
 };

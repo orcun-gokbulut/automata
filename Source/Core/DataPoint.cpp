@@ -5,200 +5,200 @@
 #include <string.h>
 #include <memory.h>
 
-OHDevice* OHDataPoint::GetDevice() const
+ADevice* ADataPoint::GetDevice() const
 {
 	return device;
 }
 
-void OHDataPoint::SetName(const char* name)
+void ADataPoint::SetName(const char* name)
 {
 	this->name = name;
 }
 
-const char* OHDataPoint::GetName() const
+const char* ADataPoint::GetName() const
 {
 	return name.c_str();
 }
 
-void OHDataPoint::SetAddress(OHAddress address)
+void ADataPoint::SetAddress(AAddress address)
 {
 	this->address = address;
 }
-OHAddress OHDataPoint::GetAddress() const
+AAddress ADataPoint::GetAddress() const
 {
 	return address;
 }
 
-void OHDataPoint::SetType(OHDataPointType type)
+void ADataPoint::SetType(OHDataPointType type)
 {
 	this->type = type;
 }
 
-OHDataPointType OHDataPoint::GetType()
+OHDataPointType ADataPoint::GetType()
 {
 	return type;
 }
 
-bool OHDataPoint::IsNull() const
+bool ADataPoint::IsNull() const
 {
 	return type == OHDataPointType::Null;
 }
 
-void OHDataPoint::SetUInt8(uint8 value)
+void ADataPoint::SetUInt8(uint8 value)
 {
 	CheckError(type == OHDataPointType::UINT8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = value;
 }
 
-uint8 OHDataPoint::GetUInt8() const
+uint8 ADataPoint::GetUInt8() const
 {
 	CheckError(type == OHDataPointType::UINT8, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (uint8)value.integer;
 }
 
-void OHDataPoint::SetUInt16(uint16 value) 
+void ADataPoint::SetUInt16(uint16 value) 
 {
 	CheckError(type == OHDataPointType::UINT16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = value;
 }
 
-uint16 OHDataPoint::GetUInt16() const
+uint16 ADataPoint::GetUInt16() const
 {
 	CheckError(type == OHDataPointType::UINT16, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (uint16)value.integer;
 }
 
-void OHDataPoint::SetUInt32(uint32 value)
+void ADataPoint::SetUInt32(uint32 value)
 {
 	CheckError(type == OHDataPointType::UINT32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = value;
 }
 
-uint32 OHDataPoint::GetUInt32() const
+uint32 ADataPoint::GetUInt32() const
 {
 	CheckError(type == OHDataPointType::UINT32, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (uint32)value.integer;
 }
 
-void OHDataPoint::SetUInt64(uint64 value)
+void ADataPoint::SetUInt64(uint64 value)
 {
 	CheckError(type == OHDataPointType::UINT64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = value;
 }
 
-uint64 OHDataPoint::GetUInt64() const
+uint64 ADataPoint::GetUInt64() const
 {
 	CheckError(type == OHDataPointType::UINT64, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return value.integer;
 }
 
-void OHDataPoint::SetInt8(int8 value)
+void ADataPoint::SetInt8(int8 value)
 {
 	CheckError(type == OHDataPointType::INT8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = (uint64)value;
 }
 
-int8 OHDataPoint::GetInt8() const
+int8 ADataPoint::GetInt8() const
 {
 	CheckError(type == OHDataPointType::INT8, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (int8)value.integer;
 }
 
-void OHDataPoint::SetInt16(int16 value)
+void ADataPoint::SetInt16(int16 value)
 {
 	CheckError(type == OHDataPointType::INT16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = (uint64)value;
 }
 
-int16 OHDataPoint::GetInt16() const
+int16 ADataPoint::GetInt16() const
 {
 	CheckError(type == OHDataPointType::INT16, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (int16)value.integer;
 }
 
-void OHDataPoint::SetInt32(int32 value)
+void ADataPoint::SetInt32(int32 value)
 {
 	CheckError(type == OHDataPointType::INT32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = (uint64)value;
 }
 
-int32 OHDataPoint::GetInt32() const
+int32 ADataPoint::GetInt32() const
 {
 	CheckError(type == OHDataPointType::INT32, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (int32)value.integer;
 }
 
-void OHDataPoint::SetInt64(int64 value)
+void ADataPoint::SetInt64(int64 value)
 {
 	CheckError(type == OHDataPointType::INT64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.integer = (uint64)value;
 }
 
-int64 OHDataPoint::GetInt64() const
+int64 ADataPoint::GetInt64() const
 {
 	CheckError(type == OHDataPointType::INT64, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (int64)value.integer;
 }
 
-void OHDataPoint::SetFloat(float value)
+void ADataPoint::SetFloat(float value)
 {
 	CheckError(type == OHDataPointType::FLOAT, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.double_ = (double)value;
 }
 
-float OHDataPoint::GetFloat()
+float ADataPoint::GetFloat()
 {
 	CheckError(type == OHDataPointType::FLOAT, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return (float)value.double_;
 }
 
-void OHDataPoint::SetDouble(double value)
+void ADataPoint::SetDouble(double value)
 {
 	CheckError(type == OHDataPointType::FLOAT, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.double_ = value;
 }
 
-double OHDataPoint::GetDouble() const
+double ADataPoint::GetDouble() const
 {
 	CheckError(type == OHDataPointType::FLOAT, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return value.double_;
 }
 
-void OHDataPoint::SetBoolean(bool value)
+void ADataPoint::SetBoolean(bool value)
 {
 	CheckError(type == OHDataPointType::BOOL, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 
 	this->value.boolean = value;
 }
 
-bool OHDataPoint::GetBoolean() const
+bool ADataPoint::GetBoolean() const
 {
 	CheckError(type == OHDataPointType::BOOL, 0, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 
 	return value.boolean;
 }
 
-void OHDataPoint::SetString(const char* value)
+void ADataPoint::SetString(const char* value)
 {
 	CheckError(type == OHDataPointType::STRING, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
 	CheckError(value == nullptr, RETURN_VOID, "Setting OHDataPoint value is failed. String is NULL.");
@@ -207,14 +207,14 @@ void OHDataPoint::SetString(const char* value)
 	strcpy_s(this->value.string_, 15, value);
 }
 
-const char* OHDataPoint::GetString()
+const char* ADataPoint::GetString()
 {
 	CheckError(type == OHDataPointType::STRING, nullptr, "Getting OHDataPoint value is failed. Type Mismatch. Data Point Type: %d, Set Type: %d.", this->type, type);
 	
 	return value.string_;
 }
 
-OHDataPoint::OHDataPoint()
+ADataPoint::ADataPoint()
 {
 	device = nullptr;
 	memset(&value, 0, sizeof(value));

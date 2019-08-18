@@ -2,32 +2,32 @@
 
 #include "Common/Error.h"
 
-void OHDevice::SetSerialNumber(uint32 number)
+void ADevice::SetSerialNumber(uint32 number)
 {
 	serialNumber = number;
 }
 
-int OHDevice::GetSerialNumber() const
+int ADevice::GetSerialNumber() const
 {
 	return serialNumber;
 }
 
-void OHDevice::SetName(const string& name)
+void ADevice::SetName(const string& name)
 {
 	this->name = name;
 }
 
-const string OHDevice::GetName() const
+const string ADevice::GetName() const
 {
 	return name;
 }
 
-const std::vector<OHDataPoint*>& OHDevice::GetDataPoints() const
+const std::vector<ADataPoint*>& ADevice::GetDataPoints() const
 {
 	return dataPoints;
 }
 
-void OHDevice::AddDataPoint(OHDataPoint* dataPoint)
+void ADevice::AddDataPoint(ADataPoint* dataPoint)
 {
 	CheckError(dataPoint == NULL, RETURN_VOID, "Cannot add data point to device. Data point is NULL. Device Name : % s.", GetName());
 	CheckError(dataPoint->GetDevice() == nullptr, RETURN_VOID,
@@ -38,7 +38,7 @@ void OHDevice::AddDataPoint(OHDataPoint* dataPoint)
 	dataPoints.insert(dataPoints.end(), dataPoint);
 }
 
-void OHDevice::RemoveDataPoint(OHDataPoint* dataPoint)
+void ADevice::RemoveDataPoint(ADataPoint* dataPoint)
 {
 	CheckError(dataPoint == NULL, RETURN_VOID, "Cannot remove data point from device. Data point is NULL. Device Name : % s.", GetName());
 	CheckError(dataPoint->GetDevice() == this, RETURN_VOID,
@@ -49,17 +49,17 @@ void OHDevice::RemoveDataPoint(OHDataPoint* dataPoint)
 	dataPoints.erase(std::find(dataPoints.begin(), dataPoints.end(), dataPoint));
 }
 
-void OHDevice::Process()
+void ADevice::Process()
 {
 
 }
 
-OHDevice::OHDevice()
+ADevice::ADevice()
 {
 	serialNumber = 0;
 }
 
-OHDevice::~OHDevice()
+ADevice::~ADevice()
 {
 	for (auto iterator = dataPoints.begin(); iterator != dataPoints.end(); iterator++)
 		delete iterator._Ptr;

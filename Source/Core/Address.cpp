@@ -4,60 +4,60 @@
 
 #include <regex>
 
-void OHAddress::SetA(uint8 value)
+void AAddress::SetA(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part A part is too big.");
 	a = value;
 }
 
-uint8 OHAddress::GetA() const
+uint8 AAddress::GetA() const
 {
 	return a;
 }
 
-void OHAddress::SetB(uint8 value)
+void AAddress::SetB(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part B part is too big.");
 	b = value;
 }
 
-uint8 OHAddress::GetB() const
+uint8 AAddress::GetB() const
 {
 	return b;
 }
 
-void OHAddress::SetC(uint8 value)
+void AAddress::SetC(uint8 value)
 {
 	c = value;
 }
 
-uint8 OHAddress::GetC() const
+uint8 AAddress::GetC() const
 {
 	return c;
 }
 
-void OHAddress::SetRaw(uint16 value)
+void AAddress::SetRaw(uint16 value)
 {
 	raw = value;
 }
 
-uint16 OHAddress::GetRaw() const
+uint16 AAddress::GetRaw() const
 {
 	return raw;
 }
 
-void OHAddress::SetInt(uint16 value)
+void AAddress::SetInt(uint16 value)
 {
 	byte[1] = (uint8)(value << 8);
 	byte[0] = (uint8)(value & 0xFF);
 }
 
-uint16 OHAddress::GetInt() const
+uint16 AAddress::GetInt() const
 {
 	return ((uint8)byte[1] << 8) | (uint8)byte[0];
 }
 
-void OHAddress::SetString(const char* value)
+void AAddress::SetString(const char* value)
 {
 	regex re(R"(^\s*([0-9]+)\s*\/\s*([0-9]+)\s*\/\s*([0-9]+)\s*$)");
 	smatch match;
@@ -77,28 +77,28 @@ void OHAddress::SetString(const char* value)
 	c = tc;
 }
 
-string OHAddress::GetString() const
+string AAddress::GetString() const
 {
 	return std::to_string(a) + "/" + std::to_string(b) + "/" + std::to_string(c);
 }
 
-OHAddress::OHAddress()
+AAddress::AAddress()
 {
 	byte[0] = 0x00;
 	byte[1] = 0x00;
 }
 
-OHAddress::OHAddress(const char* value)
+AAddress::AAddress(const char* value)
 {
 	SetString(value);
 }
 
-OHAddress::OHAddress(uint16 raw)
+AAddress::AAddress(uint16 raw)
 {
 	SetRaw(raw);
 }
 
-OHAddress::OHAddress(uint8 a, uint8 b, uint8 c)
+AAddress::AAddress(uint8 a, uint8 b, uint8 c)
 {
 	this->a = a;
 	this->b = b;

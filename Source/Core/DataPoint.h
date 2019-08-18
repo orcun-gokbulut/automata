@@ -24,14 +24,14 @@ enum class OHDataPointType
 	STRING
 };
 
-class OHDevice;
+class ADevice;
 
-class OHDataPoint
+class ADataPoint
 {
 	private:
-		OHDevice*			device;
+		ADevice*			device;
 		string				name;
-		OHAddress			address;
+		AAddress			address;
 		OHDataPointType		type;
 		union
 		{
@@ -42,13 +42,13 @@ class OHDataPoint
 		} value;
 
 	public:
-		OHDevice*			GetDevice() const;
+		ADevice*			GetDevice() const;
 
 		void				SetName(const char* value);
 		const char*			GetName() const;
 
-		void				SetAddress(OHAddress address);
-		OHAddress			GetAddress() const;
+		void				SetAddress(AAddress address);
+		AAddress			GetAddress() const;
 
 		void				SetType(OHDataPointType type);
 		OHDataPointType		GetType();
@@ -85,5 +85,5 @@ class OHDataPoint
 		void				SetString(const char* value);
 		const char*			GetString();
 
-							OHDataPoint();
+							ADataPoint();
 };

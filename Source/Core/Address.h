@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class OHAddress
+class AAddress
 {
 	private:
 		union
@@ -41,8 +41,8 @@ class OHAddress
 		string			GetString() const;
 
 
-						OHAddress();
-						OHAddress(const char* value);
-						OHAddress(uint16 raw);
-						OHAddress(uint8 a, uint8 b, uint8 c);
+						AAddress();
+						AAddress(const char* value);
+						AAddress(uint16 raw);
+						AAddress(uint8 a, uint8 b, uint8 c);
 };
