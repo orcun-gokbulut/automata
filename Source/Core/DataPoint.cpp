@@ -5,6 +5,11 @@
 #include <string.h>
 #include <memory.h>
 
+OHDevice* OHDataPoint::GetDevice() const
+{
+	return device;
+}
+
 void OHDataPoint::SetName(const char* name)
 {
 	this->name = name;
@@ -211,5 +216,6 @@ const char* OHDataPoint::GetString()
 
 OHDataPoint::OHDataPoint()
 {
+	device = nullptr;
 	memset(&value, 0, sizeof(value));
 }

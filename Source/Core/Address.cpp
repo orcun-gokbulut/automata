@@ -57,12 +57,13 @@ uint16 OHAddress::GetInt() const
 	return ((uint8)byte[1] << 8) | (uint8)byte[0];
 }
 
-void OHAddress::SetString(const string& value)
+void OHAddress::SetString(const char* value)
 {
 	regex re(R"(^\s*([0-9]+)\s*\/\s*([0-9]+)\s*\/\s*([0-9]+)\s*$)");
 	smatch match;
 	
-	bool result = regex_match(value, match, re);
+	string valueStr = value;
+	bool result = regex_match(valueStr, match, re);
 	CheckError(!result, RETURN_VOID, "Cannot set address. Invalid address format.");
 
 	int ta = atoi(match.str(1).c_str());
@@ -85,6 +86,11 @@ OHAddress::OHAddress()
 {
 	byte[0] = 0x00;
 	byte[1] = 0x00;
+}
+
+OHAddress::OHAddress(const char* value)
+{
+	SetString(value);
 }
 
 OHAddress::OHAddress(uint16 raw)

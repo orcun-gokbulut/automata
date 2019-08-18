@@ -24,9 +24,12 @@ enum class OHDataPointType
 	STRING
 };
 
+class OHDevice;
+
 class OHDataPoint
 {
 	private:
+		OHDevice*			device;
 		string				name;
 		OHAddress			address;
 		OHDataPointType		type;
@@ -39,6 +42,8 @@ class OHDataPoint
 		} value;
 
 	public:
+		OHDevice*			GetDevice() const;
+
 		void				SetName(const char* value);
 		const char*			GetName() const;
 

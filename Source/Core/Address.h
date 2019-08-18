@@ -37,10 +37,12 @@ class OHAddress
 		void			SetRaw(uint16 value);
 		uint16			GetRaw() const;
 
-		void			SetString(const string& value);
+		void			SetString(const char* value);
 		string			GetString() const;
 
+
 						OHAddress();
+						OHAddress(const char* value);
 						OHAddress(uint16 raw);
 						OHAddress(uint8 a, uint8 b, uint8 c);
 };

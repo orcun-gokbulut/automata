@@ -67,8 +67,8 @@ class OHTelegram
 		void						SetFirstPayload(uint8 value);
 		uint8						GetFirstPayload() const;
 
-		void						SetPayload(void* data, size_t size);
-		void*						GetPayload() const;
+		void						SetPayload(const void* data, size_t size);
+		const void*					GetPayload() const;
 		size_t						GetPayloadSize() const;
 
 		void						Generate(void* buffer, size_t& size) const;

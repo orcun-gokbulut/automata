@@ -1,8 +1,8 @@
 #include "Address.h"
 
-#define TELEGRAM_MAX_PAYLOAD_SIZE 16
-#define TELEGRAM_MIN_SIZE 8
-#define TELEGRAM_PAYLOAD_OFFSET 7
+#define TELEGRAM_MAX_PAYLOAD_SIZE 14
+#define TELEGRAM_MIN_SIZE 9
+#define TELEGRAM_PAYLOAD_OFFSET 8
 
 
 #pragma pack(push)

@@ -73,15 +73,15 @@ uint8 OHTelegram::GetFirstPayload() const
 	return firstPayload;
 }
 
-void OHTelegram::SetPayload(void* data, size_t size)
+void OHTelegram::SetPayload(const void* data, size_t size)
 {
-	CheckError(size > 13, RETURN_VOID, "Cannot set payload. Payload is too big.");
+	CheckError(size > TELEGRAM_MAX_PAYLOAD_SIZE, RETURN_VOID, "Cannot set payload. Payload is too big.");
 
 	payload.resize(size);
 	memcpy(payload.begin()._Ptr, data, size);
 }
 
-void* OHTelegram::GetPayload() const
+const void* OHTelegram::GetPayload() const
 {
 	return payload.begin()._Ptr;
 }
@@ -96,14 +96,16 @@ void OHTelegram::Generate(void* buffer, size_t& size) const
 	OHTelegramPacket* packet = (OHTelegramPacket*)buffer;
 	packet->control.frameFormat = (uint8)OHTelegramFrameFormat::Standard;
 	packet->control.reserved0 = 0x01;
-	packet->control.repeadFlag = repeatFlag;
+	packet->control.repeadFlag = GetRepeatFlag();
 	packet->control.reserved1 = 0x00;
 	packet->source = source.GetRaw();
-	packet->destination = source.GetRaw();
+	packet->destination = destination.GetRaw();
 	packet->routing.counter = 0x00;
 	packet->routing.destinationAddressType = (uint8)GetAddressType();
 	packet->routing.payloadLenght = GetPayloadSize();
-	
+	packet->command.command = (uint8)GetCommand();
+	packet->command.payload = GetFirstPayload();
+
 	uint8* bytes = (uint8*)buffer;
 	if (payload.size() != 0)
 		memcpy(bytes + TELEGRAM_PAYLOAD_OFFSET, payload.begin()._Ptr, payload.size());
@@ -135,7 +137,7 @@ bool OHTelegram::Process(const void* buffer, size_t size)
 	
 	SetRepeatFlag(packet->control.repeadFlag);
 	SetSource(packet->source);
-	SetDestination(packet->source);
+	SetDestination(packet->destination);
 	SetCommand((OHTelegramCommand)packet->command.command);
 	SetFirstPayload(packet->command.payload);
 	SetAddressType((OHTelegramAddressType)packet->routing.destinationAddressType);
