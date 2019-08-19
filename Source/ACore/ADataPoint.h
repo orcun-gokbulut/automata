@@ -7,7 +7,7 @@
 
 using namespace std;
 
-enum class OHDataPointType
+enum class ADataPointType
 {
 	Null,
 	UINT8,
@@ -28,11 +28,12 @@ class ADevice;
 
 class ADataPoint
 {
+	friend class ADevice;
 	private:
 		ADevice*			device;
 		string				name;
 		AAddress			address;
-		OHDataPointType		type;
+		ADataPointType		type;
 		union
 		{
 			uint64			integer;
@@ -50,8 +51,8 @@ class ADataPoint
 		void				SetAddress(AAddress address);
 		AAddress			GetAddress() const;
 
-		void				SetType(OHDataPointType type);
-		OHDataPointType		GetType();
+		void				SetType(ADataPointType type);
+		ADataPointType		GetType();
 
 		bool				IsNull() const;
 

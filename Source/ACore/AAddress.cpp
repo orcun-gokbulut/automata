@@ -82,6 +82,17 @@ string AAddress::GetString() const
 	return std::to_string(a) + "/" + std::to_string(b) + "/" + std::to_string(c);
 }
 
+bool AAddress::operator==(const AAddress& other)
+{
+	return raw == other.raw;
+}
+
+bool AAddress::operator!=(const AAddress& other)
+{
+	return raw != other.raw;
+}
+
+
 AAddress::AAddress()
 {
 	byte[0] = 0x00;

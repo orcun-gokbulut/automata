@@ -1,5 +1,6 @@
 #include "ACore/AAddress.h"
 #include "ACore/ATelegram.h"
+#include "ACore/ADataPoint.h"
 
 #include <string.h>
 
@@ -7,6 +8,9 @@ int main(int argc, const char** argv)
 {
 	AAddress address;
 	address.SetString("10/11/205");
+
+	
+	ADataPoint* Datapoint = new ADataPoint;
 
 	ATelegram Test;
 	const char* payload = "orcun here";
