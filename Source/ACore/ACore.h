@@ -1,12 +1,25 @@
-#pragma once
+﻿#pragma once
 
 #include <vector>
 
 class ADevice;
+class ATelegram;
+
+struct hid_device_;
+
 class ACore
 {
 	private:
 		std::vector<ADevice*>				devices;
+		hid_device_*						interfaceDevice;
+
+		bool								initialized;
+
+		bool								InitializeDevices();
+		bool								DeinitializeDevices();
+
+		bool								InitializeInterface();
+		bool								DeinitializeInterface();
 
 	public:
 		const std::vector<ADevice*>&		GetDevices() const;
@@ -14,13 +27,16 @@ class ACore
 		void								AddDevice(ADevice* device);
 		void								RemoveDevice(ADevice* device);
 
-		void								SendTelegram(const ATelegram& telegram);
+		bool								IsInitialized();
+		bool								Initialize();
+		bool								Deinitialize();
 
-		virtual void						Process();
+		void								DispatchTelegram(const ATelegram& telegram);
+		bool								SendTelegram(const ATelegram& telegram);
 
-		void								Initialize();
-		void								Deinitialize();
+		void								Process();
+		void								Execute();
 
 											ACore();
-		virtual								~ACore();
+											~ACore();
 };

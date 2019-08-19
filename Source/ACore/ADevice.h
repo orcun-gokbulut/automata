@@ -37,8 +37,9 @@ class ADevice
 
 		virtual void						TelegramReceived(const ATelegram& Telegram);
 		virtual void						DataPointChanged(const ADataPoint& dataPoint);
-		virtual void						Process();
 
+		virtual void						PreProcess();
+		virtual void						PostProcess();
 
 											ADevice();
 		virtual								~ADevice();

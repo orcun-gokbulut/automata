@@ -71,6 +71,8 @@ class ATelegram
 		const void*					GetPayload() const;
 		size_t						GetPayloadSize() const;
 
+		size_t						GetSize();
+
 		void						Generate(void* buffer, size_t& size) const;
 		bool						Process(const void* buffer, size_t size);
 

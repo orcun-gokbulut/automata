@@ -59,14 +59,23 @@ void ADevice::RemoveDataPoint(ADataPoint* dataPoint)
 	dataPoint->device = nullptr;
 }
 
+bool ADevice::IsInitialized()
+{
+	return initialized;
+}
+
 bool ADevice::Initialize()
 {
 	initialized = true;
+
+	return true;
 }
 
 bool ADevice::Deinitialize()
 {
 	initialized = false;
+
+	return true;
 }
 
 void ADevice::TelegramReceived(const ATelegram& telegram)
@@ -130,7 +139,12 @@ void ADevice::DataPointChanged(const ADataPoint& dataPoint)
 
 }
 
-void ADevice::Process()
+void ADevice::PreProcess()
+{
+
+}
+
+void ADevice::PostProcess()
 {
 
 }

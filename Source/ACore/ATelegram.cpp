@@ -91,6 +91,11 @@ size_t ATelegram::GetPayloadSize() const
 	return payload.size();
 }
 
+size_t ATelegram::GetSize()
+{
+	return GetPayloadSize() + A_TELEGRAM_MIN_SIZE;
+}
+
 void ATelegram::Generate(void* buffer, size_t& size) const
 {
 	ATelegramPacket* packet = (ATelegramPacket*)buffer;

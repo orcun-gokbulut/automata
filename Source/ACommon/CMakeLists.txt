@@ -1,10 +1,11 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.13)
 
-set(Sources
-	ATypes.h
-	ATypes.cpp
-	AError.h
-	AError.cpp)
+add_library(ACommon STATIC "")
 
-add_library(ACommon ${Sources})
+target_sources(ACommon PUBLIC  ATypes.h)
+target_sources(ACommon PRIVATE ATypes.cpp)
+target_sources(ACommon PUBLIC  AError.h)
+target_sources(ACommon PRIVATE AError.cpp)
+
+get_property(Sources TARGET ACommon PROPERTY SOURCES)
 source_group("" FILES ${Sources})
