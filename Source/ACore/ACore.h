@@ -3,7 +3,8 @@
 #include <vector>
 
 class ADevice;
-class ATelegram;
+class ACEMIMessageData;
+class AHIDReport;
 
 struct hid_device_;
 
@@ -12,6 +13,11 @@ class ACore
 	private:
 		std::vector<ADevice*>				devices;
 		hid_device_*						interfaceDevice;
+		size_t								telegramIndex;
+		size_t								HIDPacketIndex;
+
+		bool								printHIDPackets;
+		bool								printTelegrams;
 
 		bool								initialized;
 
@@ -27,12 +33,21 @@ class ACore
 		void								AddDevice(ADevice* device);
 		void								RemoveDevice(ADevice* device);
 
+		void								SetPrintTelegrams(bool enabled);
+		bool								GetPrintTelegrams() const;
+
+		void								SetPrintHIDPackets(bool enabled);
+		bool								GetPrintHIDPackets() const;
+
 		bool								IsInitialized();
 		bool								Initialize();
 		bool								Deinitialize();
 
-		void								DispatchTelegram(const ATelegram& telegram);
-		bool								SendTelegram(const ATelegram& telegram);
+		void								DispatchHIDPacket(const AHIDReport& packet);
+		void								DispatchTelegram(const ACEMIMessageData& telegram);
+
+		bool								SendPacket(const AHIDReport& packet);
+		bool								SendTelegram(const ACEMIMessageData& telegram);
 
 		void								Process();
 		void								Execute();

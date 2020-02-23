@@ -32,7 +32,7 @@ class ADataPoint
 	private:
 		ADevice*			device;
 		string				name;
-		AAddress			address;
+		AGroupAddress			address;
 		ADataPointType		type;
 		union
 		{
@@ -48,8 +48,8 @@ class ADataPoint
 		void				SetName(const char* value);
 		const char*			GetName() const;
 
-		void				SetAddress(AAddress address);
-		AAddress			GetAddress() const;
+		void				SetAddress(AGroupAddress address);
+		AGroupAddress			GetAddress() const;
 
 		void				SetType(ADataPointType type);
 		ADataPointType		GetType();

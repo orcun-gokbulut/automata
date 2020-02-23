@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-class ATelegram;
+class ACEMIMessage;
 class ACore;
 class ADevice
 {
@@ -35,7 +35,7 @@ class ADevice
 		virtual bool						Initialize();
 		virtual bool						Deinitialize();
 
-		virtual void						TelegramReceived(const ATelegram& Telegram);
+		virtual void						TelegramReceived(const ACEMIMessage* message);
 		virtual void						DataPointChanged(const ADataPoint& dataPoint);
 
 		virtual void						PreProcess();

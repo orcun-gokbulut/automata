@@ -4,112 +4,210 @@
 
 #include <regex>
 
-void AAddress::SetA(uint8 value)
+void AGroupAddress::SetA(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part A part is too big.");
 	a = value;
 }
 
-uint8 AAddress::GetA() const
+uint8 AGroupAddress::GetA() const
 {
 	return a;
 }
 
-void AAddress::SetB(uint8 value)
+void AGroupAddress::SetB(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part B part is too big.");
 	b = value;
 }
 
-uint8 AAddress::GetB() const
+uint8 AGroupAddress::GetB() const
 {
 	return b;
 }
 
-void AAddress::SetC(uint8 value)
+void AGroupAddress::SetC(uint8 value)
 {
 	c = value;
 }
 
-uint8 AAddress::GetC() const
+uint8 AGroupAddress::GetC() const
 {
 	return c;
 }
 
-void AAddress::SetRaw(uint16 value)
+void AGroupAddress::SetRaw(uint16 value)
 {
 	raw = value;
 }
 
-uint16 AAddress::GetRaw() const
+uint16 AGroupAddress::GetRaw() const
 {
 	return raw;
 }
 
-void AAddress::SetInt(uint16 value)
-{
-	byte[1] = (uint8)(value << 8);
-	byte[0] = (uint8)(value & 0xFF);
-}
-
-uint16 AAddress::GetInt() const
-{
-	return ((uint8)byte[1] << 8) | (uint8)byte[0];
-}
-
-void AAddress::SetString(const char* value)
+bool AGroupAddress::SetString(const char* value)
 {
 	regex re(R"(^\s*([0-9]+)\s*\/\s*([0-9]+)\s*\/\s*([0-9]+)\s*$)");
 	smatch match;
 	
 	string valueStr = value;
 	bool result = regex_match(valueStr, match, re);
-	CheckError(!result, RETURN_VOID, "Cannot set address. Invalid address format.");
+	CheckError(!result, false, "Cannot set address. Invalid address format.");
 
 	int ta = atoi(match.str(1).c_str());
 	int tb = atoi(match.str(2).c_str());
 	int tc = atoi(match.str(3).c_str());
 
-	CheckError(ta >= 16 || tb >= 16 || tc >= 256, RETURN_VOID, "Cannot set address. One or more of the address part(s) is too big.");
+	CheckError(ta >= 32 || tb >= 8 || tc >= 256, false, "Cannot set address. One or more of the address part(s) is too big.");
 
 	a = ta;
 	b = tb;
 	c = tc;
+
+	return true;
 }
 
-string AAddress::GetString() const
+string AGroupAddress::GetString() const
 {
 	return std::to_string(a) + "/" + std::to_string(b) + "/" + std::to_string(c);
 }
 
-bool AAddress::operator==(const AAddress& other)
+bool AGroupAddress::operator==(const AGroupAddress& other)
 {
 	return raw == other.raw;
 }
 
-bool AAddress::operator!=(const AAddress& other)
+bool AGroupAddress::operator!=(const AGroupAddress& other)
 {
 	return raw != other.raw;
 }
 
 
-AAddress::AAddress()
+AGroupAddress::AGroupAddress()
 {
 	byte[0] = 0x00;
 	byte[1] = 0x00;
 }
 
-AAddress::AAddress(const char* value)
+AGroupAddress::AGroupAddress(const char* value)
 {
 	SetString(value);
 }
 
-AAddress::AAddress(uint16 raw)
+AGroupAddress::AGroupAddress(uint16 raw)
 {
 	SetRaw(raw);
 }
 
-AAddress::AAddress(uint8 a, uint8 b, uint8 c)
+AGroupAddress::AGroupAddress(uint8 a, uint8 b, uint8 c)
+{
+	this->a = a;
+	this->b = b;
+	this->c = c;
+}
+
+
+// AIndividualAddress
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void AIndividualAddress::SetA(uint8 value)
+{
+	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part A part is too big.");
+	a = value;
+}
+
+uint8 AIndividualAddress::GetA() const
+{
+	return a;
+}
+
+void AIndividualAddress::SetB(uint8 value)
+{
+	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part B part is too big.");
+	b = value;
+}
+
+uint8 AIndividualAddress::GetB() const
+{
+	return b;
+}
+
+void AIndividualAddress::SetC(uint8 value)
+{
+	c = value;
+}
+
+uint8 AIndividualAddress::GetC() const
+{
+	return c;
+}
+
+void AIndividualAddress::SetRaw(uint16 value)
+{
+	raw = value;
+}
+
+uint16 AIndividualAddress::GetRaw() const
+{
+	return raw;
+}
+
+bool AIndividualAddress::SetString(const char* value)
+{
+	regex re(R"(^\s*([0-9]+)\s*\.\s*([0-9]+)\s*\.\s*([0-9]+)\s*$)");
+	smatch match;
+
+	string valueStr = value;
+	bool result = regex_match(valueStr, match, re);
+	CheckError(!result, false, "Cannot set address. Invalid address format.");
+
+	int ta = atoi(match.str(1).c_str());
+	int tb = atoi(match.str(2).c_str());
+	int tc = atoi(match.str(3).c_str());
+
+	CheckError(ta >= 16 || tb >= 16 || tc >= 256, false, "Cannot set address. One or more of the address part(s) is too big.");
+
+	a = ta;
+	b = tb;
+	c = tc;
+
+	return true;
+}
+
+string AIndividualAddress::GetString() const
+{
+	return std::to_string(a) + "." + std::to_string(b) + "." + std::to_string(c);
+}
+
+bool AIndividualAddress::operator==(const AIndividualAddress& other)
+{
+	return raw == other.raw;
+}
+
+bool AIndividualAddress::operator!=(const AIndividualAddress& other)
+{
+	return raw != other.raw;
+}
+
+
+AIndividualAddress::AIndividualAddress()
+{
+	byte[0] = 0x00;
+	byte[1] = 0x00;
+}
+
+AIndividualAddress::AIndividualAddress(const char* value)
+{
+	SetString(value);
+}
+
+AIndividualAddress::AIndividualAddress(uint16 raw)
+{
+	SetRaw(raw);
+}
+
+AIndividualAddress::AIndividualAddress(uint8 a, uint8 b, uint8 c)
 {
 	this->a = a;
 	this->b = b;

@@ -1,11 +1,15 @@
 #include "ACore.h"
 
 #include "ADevice.h"
-#include "ATelegram.h"
+#include "AHIDReport.h"
+#include "ACEMIMessage.h"
 
 #include "ACommon/AError.h"
 
+#include <iostream>
 #include <hidapi.h>
+
+using namespace std;
 
 bool ACore::InitializeDevices()
 {
@@ -86,7 +90,7 @@ bool ACore::InitializeInterface()
 			vendorId = currentDeviceInfo->vendor_id;
 			productId = currentDeviceInfo->product_id;
 			
-			break;
+			//break;
 		}
 
 		currentDeviceInfo = currentDeviceInfo->next;
@@ -99,6 +103,13 @@ bool ACore::InitializeInterface()
 	CheckError(interfaceDevice == nullptr, false, "Cannot initialize interface. Cannot open interface device.");
 
 	//hid_set_nonblocking(interfaceDevice, 1);
+
+	AHIDReport packet;
+	packet.SetProtocolId(0x0F);
+	packet.SetEMIId(0x01);
+	uint8 data = 0x01;
+	packet.SetData(&data, 1);
+	SendPacket(packet);
 
 	return true;
 }
@@ -148,6 +159,26 @@ void ACore::RemoveDevice(ADevice* device)
 	device->core = nullptr;
 }
 
+void ACore::SetPrintTelegrams(bool enabled)
+{
+	printTelegrams = enabled;
+}
+
+bool ACore::GetPrintTelegrams() const
+{
+	return printTelegrams;
+}
+
+void ACore::SetPrintHIDPackets(bool enabled)
+{
+	printHIDPackets = enabled;
+}
+
+bool ACore::GetPrintHIDPackets() const
+{
+	return printHIDPackets;
+}
+
 bool ACore::IsInitialized()
 {
 	return initialized;
@@ -186,8 +217,26 @@ bool ACore::Deinitialize()
 	return true;
 }
 
-void ACore::DispatchTelegram(const ATelegram& telegram)
+void ACore::DispatchHIDPacket(const AHIDReport& packet)
 {
+	if (packet.GetProtocolId() == 0x01 && packet.GetSize() > 0 && *(uint8*)packet.GetData() == 0x29)
+	{
+		ACEMIMessageData telegram;
+		if (!telegram.Process(packet.GetData(), packet.GetDataSize()))
+			return;
+
+		telegramIndex++;
+		telegram.SetIndex(telegramIndex);
+
+		DispatchTelegram(telegram);
+	}
+}
+
+void ACore::DispatchTelegram(const ACEMIMessageData& telegram)
+{
+	if (printTelegrams)
+		cout << telegram.Print();
+	
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
@@ -195,23 +244,32 @@ void ACore::DispatchTelegram(const ATelegram& telegram)
 		if (!currentDevice->IsInitialized())
 			continue;
 
-		currentDevice->TelegramReceived(telegram);
+		currentDevice->TelegramReceived(&telegram);
 	}
 }
 
-bool ACore::SendTelegram(const ATelegram& telegram)
+bool ACore::SendPacket(const AHIDReport& packet)
+{
+	uint8 size;
+	uint8 packetBuffer[256];
+	packet.Generate(packetBuffer, size);
+	int bytesSend = hid_write(interfaceDevice, packetBuffer, size);
+	CheckError(bytesSend < size, false, "Cannot send packet.");
+
+	return true;
+}
+
+bool ACore::SendTelegram(const ACEMIMessageData& telegram)
 {
 	CheckError(!IsInitialized(), false, "Cannot send telegram. Core is not initialized.");
 
-	uint8 buffer[1024];
-	size_t size;
-	telegram.Generate(buffer, size);
-	
-	int bytesSend = hid_write(interfaceDevice, buffer, size);
-	
-	CheckError(bytesSend != size, false, "Cannot send telegram.");
+	uint8 telegramBuffer[256];
+	uint8 size;
+	telegram.Generate(telegramBuffer, size);
 
-	return true;
+	AHIDReport packet;
+	packet.SetData(telegramBuffer, size);
+	return SendPacket(packet);
 }
 
 void ACore::Process()
@@ -230,17 +288,15 @@ void ACore::Process()
 	uint8 buffer[1024];
 	uint8* cursor = buffer;
 	int bytesReceived = hid_read_timeout(interfaceDevice, buffer, 1024, 100);
-	while (bytesReceived > 0)
-	{
-		ATelegram telegram;
-		if (telegram.Process(buffer, 1024))
-			break;
+	if (bytesReceived == 0)
+		return;
 
-		DispatchTelegram(telegram);
+	AHIDReport packet;
+	packet.Process(buffer, bytesReceived);
 
-		bytesReceived -= (int)telegram.GetSize();
-		cursor = cursor + telegram.GetSize();
-	}
+	HIDPacketIndex++;
+	packet.SetIndex(HIDPacketIndex);
+	DispatchHIDPacket(packet);
 
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
@@ -262,8 +318,13 @@ void ACore::Execute()
 
 ACore::ACore()
 {
+	telegramIndex = 0;
+	HIDPacketIndex = 0;
+
 	interfaceDevice = nullptr;
 	initialized = false;
+	printTelegrams = false;
+	printHIDPackets = false;
 }
 
 ACore::~ACore()

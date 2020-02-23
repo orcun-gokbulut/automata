@@ -1,7 +1,7 @@
 #include "ADevice.h"
 
 #include "ADataPoint.h"
-#include "ATelegram.h"
+#include "ACEMIMessage.h"
 #include "ACommon/AError.h"
 
 
@@ -78,12 +78,17 @@ bool ADevice::Deinitialize()
 	return true;
 }
 
-void ADevice::TelegramReceived(const ATelegram& telegram)
+void ADevice::TelegramReceived(const ACEMIMessage* message)
 {
+	if (message->GetMessageCode() == ACEMIMessageCode::Data_Received)
+		return;
+
+	const ACEMIMessageData* dataMessage = static_cast<const ACEMIMessageData*>(message);
+
 	for (auto iterator = dataPoints.begin(); iterator != dataPoints.end(); iterator++)
 	{
 		ADataPoint* current = *iterator;
-		if (current->GetAddress() == telegram.GetDestination())
+		if (current->GetAddress() == dataMessage->GetDestinationGroup())
 		{
 			switch (current->GetType())
 			{
@@ -92,39 +97,47 @@ void ADevice::TelegramReceived(const ATelegram& telegram)
 					break;
 
 				case ADataPointType::UINT8:
-					current->SetUInt8(telegram.GetFirstPayload());
+					current->SetUInt8(dataMessage->GetUInt8());
 					break;
 
 				case ADataPointType::UINT16:
+					current->SetUInt16(dataMessage->GetUInt16());
 					break;
 
 				case ADataPointType::UINT32:
+					current->SetUInt32(dataMessage->GetUInt32());
 					break;
 
 				case ADataPointType::UINT64:
+					current->SetUInt64(dataMessage->GetUInt64());
 					break;
 
 				case ADataPointType::INT8:
-					current->SetUInt8(telegram.GetFirstPayload());
+					current->SetInt8(dataMessage->GetInt8());
 					break;
 
 				case ADataPointType::INT16:
+					current->SetInt16(dataMessage->GetInt16());
 					break;
 
 				case ADataPointType::INT32:
+					current->SetInt32(dataMessage->GetInt32());
 					break;
 
 				case ADataPointType::INT64:
+					current->SetInt64(dataMessage->GetInt64());
 					break;
 
 				case ADataPointType::FLOAT:
+					current->SetFloat(dataMessage->GetFloat());
 					break;
 
 				case ADataPointType::DOUBLE:
+					current->SetDouble(dataMessage->GetDouble());
 					break;
 
 				case ADataPointType::BOOL:
-					current->SetUInt8(telegram.GetFirstPayload());
+					current->SetBoolean(dataMessage->GetBoolean());
 					break;
 
 				case ADataPointType::STRING:

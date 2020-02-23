@@ -1,30 +1,34 @@
 #include "AError.h"
 
-#include <stdio.h>
+#include <iostream>
+
 #include <stdlib.h>
 #include <stdarg.h>
 
+using namespace std;
+
 void AConsole::Output(AOutputType Type, const char* Module, const char* Message, ...)
 {
-	switch(Type)
+	cout << "[" << Module << "]";
+	switch (Type)
 	{
 		case AOutputType::CriticalError:
-			printf("[%s] CRITICAL ERROR: ", Module);
+			cout << "CRITICAL ERROR: ";
 			break;
 
 		case AOutputType::Error:
-			printf("[%s] Error: ", Module);
+			cout << "Error: ";
 			break;
 
 		case AOutputType::Warning:
-			printf("[%s] Warning: ", Module);
+			cout << "Warning: ";
 			break;
 
 		default:
 		case AOutputType::Log:
-			printf("[%s] Log: ", Module);
+			cout << "Log: ";
 			break;
-	}
+	};
 
 	va_list args;
 	va_start(args, Message);

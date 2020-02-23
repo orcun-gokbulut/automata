@@ -8,3 +8,6 @@
 #define uint16 unsigned short
 #define uint32 unsigned int
 #define uint64 unsigned long long
+
+void toHex(uint8 value, char* hexOutput);
+void toHex16(uint16 value, char* hexOutput);

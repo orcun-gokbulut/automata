@@ -2,7 +2,7 @@
 
 #define RETURN_VOID
 
-#define Log(Message, ...) do { AConsole::Output(AOutputType::Log, "", Message, __VA_ARGS__); } while(false)
+#define Log(Message, ...) do { AConsole::Output(AOutputType::Log, __FUNCTION__, Message, __VA_ARGS__); } while(false)
 
 #define RaiseCriticalError(Message, ...) do { AConsole::Output(AOutputType::CriticalError, "",  Message, __VA_ARGS__); } while(false)
 #define RaiseError(Message, ...) do { AConsole::Output(AOutputType::Error, "", Message, __VA_ARGS__); } while(false)

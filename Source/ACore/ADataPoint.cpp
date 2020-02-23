@@ -20,11 +20,11 @@ const char* ADataPoint::GetName() const
 	return name.c_str();
 }
 
-void ADataPoint::SetAddress(AAddress address)
+void ADataPoint::SetAddress(AGroupAddress address)
 {
 	this->address = address;
 }
-AAddress ADataPoint::GetAddress() const
+AGroupAddress ADataPoint::GetAddress() const
 {
 	return address;
 }
