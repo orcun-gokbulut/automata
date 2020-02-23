@@ -73,12 +73,12 @@ string AGroupAddress::GetString() const
 	return std::to_string(a) + "/" + std::to_string(b) + "/" + std::to_string(c);
 }
 
-bool AGroupAddress::operator==(const AGroupAddress& other)
+bool AGroupAddress::operator==(const AGroupAddress& other) const
 {
 	return raw == other.raw;
 }
 
-bool AGroupAddress::operator!=(const AGroupAddress& other)
+bool AGroupAddress::operator!=(const AGroupAddress& other) const
 {
 	return raw != other.raw;
 }
@@ -180,12 +180,12 @@ string AIndividualAddress::GetString() const
 	return std::to_string(a) + "." + std::to_string(b) + "." + std::to_string(c);
 }
 
-bool AIndividualAddress::operator==(const AIndividualAddress& other)
+bool AIndividualAddress::operator==(const AIndividualAddress& other) const
 {
 	return raw == other.raw;
 }
 
-bool AIndividualAddress::operator!=(const AIndividualAddress& other)
+bool AIndividualAddress::operator!=(const AIndividualAddress& other) const
 {
 	return raw != other.raw;
 }

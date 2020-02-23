@@ -10,6 +10,7 @@ class ACore;
 class ADevice
 {
 	friend class ACore;
+	friend class ADataPoint;
 	private:
 		ACore*								core;
 		uint32								serialNumber;
@@ -17,6 +18,13 @@ class ADevice
 		bool								initialized;
 
 		std::vector<ADataPoint*>			dataPoints;
+
+		void								DataPointChanged(const ADataPoint& dataPoint);
+
+	protected:
+		const std::vector<ADataPoint*>&		GetDataPoints() const;
+		void								RegisterDataPoint(ADataPoint* dataPoint);
+		void								UnregisterDataPoint(ADataPoint* dataPoint);
 
 	public:
 		ACore*								GetCore() const;
@@ -26,17 +34,12 @@ class ADevice
 
 		void								SetName(const string& name);
 		const char*							GetName() const;
-
-		const std::vector<ADataPoint*>&		GetDataPoints() const;
-		void								AddDataPoint(ADataPoint* dataPoint);
-		void								RemoveDataPoint(ADataPoint* dataPoint);
 		
 		bool								IsInitialized();
 		virtual bool						Initialize();
 		virtual bool						Deinitialize();
 
-		virtual void						TelegramReceived(const ACEMIMessage* message);
-		virtual void						DataPointChanged(const ADataPoint& dataPoint);
+		virtual void						TelegramReceived(const ACEMIMessage& message);
 
 		virtual void						PreProcess();
 		virtual void						PostProcess();

@@ -9,7 +9,7 @@ using namespace std;
 
 void AConsole::Output(AOutputType Type, const char* Module, const char* Message, ...)
 {
-	cout << "[" << Module << "]";
+	cout << "[" << Module << "] ";
 	switch (Type)
 	{
 		case AOutputType::CriticalError:

@@ -1,8 +1,9 @@
 #include "ACEMIMessage.h"
 
 #include "ACEMIProtocol.h"
-#include "ACommon/AError.h"
 
+#include "ACommon/AError.h"
+#include "ACommon/AEndian.h"
 
 #include <sstream>
 
@@ -53,6 +54,7 @@ void ACEMIMessage::Generate(void* buffer, uint8& size) const
 	header->additionalInfoSize = GetAdditionalInfoSize();
 	if (header->additionalInfoSize != 0)
 		memcpy((uint8*)buffer + sizeof(header), GetAdditionalInfo(), GetAdditionalInfoSize());
+	size = sizeof(ACEMIHeader) + GetAdditionalInfoSize();
 }
 
 size_t ACEMIMessage::Process(const void* buffer, size_t size)
@@ -64,7 +66,7 @@ size_t ACEMIMessage::Process(const void* buffer, size_t size)
 	return sizeof(ACEMIHeader) + header->additionalInfoSize;
 }
 
-std::string ACEMIMessage::Print() const
+std::string ACEMIMessage::ToString() const
 {
 	stringstream output;
 	output << "Telegram #" << index << "\n";
@@ -89,6 +91,11 @@ ACEMIMessage::ACEMIMessage()
 	messageCode = ACEMIMessageCode::Data_Transmit;
 	memset(additionalInfo, 0, sizeof(additionalInfo));
 	additionalInfoSize = 0;
+}
+
+ACEMIMessage::~ACEMIMessage()
+{
+
 }
 
 
@@ -275,35 +282,35 @@ uint8 ACEMIMessageData::GetUInt8() const
 
 void ACEMIMessageData::SetUInt16(uint16 value)
 {
-	*(uint16*)payload = value;
+	*(uint16*)payload = bswap_16(value);
 	payloadSize = 2;
 }
 
 uint16 ACEMIMessageData::GetUInt16() const
 {
-	return *(int16*)payload;
+	return bswap_16(*(int16*)payload);
 }
 
 void ACEMIMessageData::SetUInt32(uint32 value)
 {
-	*(uint32*)payload = value;
+	*(uint32*)payload = bswap_32(value);
 	payloadSize = 4;
 }
 
 uint32 ACEMIMessageData::GetUInt32() const
 {
-	return *(uint32*)payload;
+	return bswap_32(*(uint32*)payload);
 }
 
 void ACEMIMessageData::SetUInt64(uint64 value)
 {
-	*(uint64*)payload = value;
+	*(uint64*)payload = bswap_64(value);
 	payloadSize = 8;
 }
 
 uint64 ACEMIMessageData::GetUInt64() const
 {
-	return *(uint64*)payload;
+	return bswap_64(*(uint64*)payload);
 }
 
 void ACEMIMessageData::SetInt8(int8 value)
@@ -319,46 +326,46 @@ int8 ACEMIMessageData::GetInt8() const
 
 void ACEMIMessageData::SetInt16(int16 value)
 {
-	*(int16*)payload = value;
+	*(int16*)payload = (int16)bswap_16(value);
 	payloadSize = 2;
 }
 
 int16 ACEMIMessageData::GetInt16() const
 {
-	return *(int16*)payload;
+	return (int16)bswap_16(*(int16*)payload);
 }
 
 void ACEMIMessageData::SetInt32(int32 value)
 {
-	*(int32*)payload = value;
+	*(int32*)payload = (int32)bswap_32(value);
 	payloadSize = 4;
 }
 
 int32 ACEMIMessageData::GetInt32() const
 {
-	return *(int32*)payload;
+	return (int32)bswap_32(*(int32*)payload);
 }
 
 void ACEMIMessageData::SetInt64(int64 value)
 {
-	*(int64*)payload = value;
+	*(int64*)payload = (int64)bswap_64(value);
 	payloadSize = 8;
 }
 
 int64 ACEMIMessageData::GetInt64() const
 {
-	return *(int64*)payload;
+	return (int64)bswap_64(*(int64*)payload);
 }
 
-void ACEMIMessageData::SetHalf(float value)
+void ACEMIMessageData::SetHalfFloat(float value)
 {
-	*(float*)payload = value;
+	*(uint16*)payload = toHalf(value);
 	payloadSize = 2;
 }
 
-float ACEMIMessageData::GetHalf() const
+float ACEMIMessageData::GetHalfFloat() const
 {
-	return *(float*)payload;
+	return toFloat(*(uint16*)payload);
 }
 
 void ACEMIMessageData::SetFloat(float value)
@@ -402,7 +409,7 @@ void ACEMIMessageData::Generate(void* buffer, uint8& size) const
 {
 	ACEMIMessage::Generate(buffer, size);
 
-	ACEMIDataPacket* packet = (ACEMIDataPacket*)buffer;
+	ACEMIDataPacket* packet = (ACEMIDataPacket*)((uint8*)buffer + size);
 	packet->control.frameFormat = (uint8)GetFrameFormat();
 	packet->control.reserved = 0;
 	packet->control.repeatFlag = GetRepeatFlag();
@@ -419,27 +426,21 @@ void ACEMIMessageData::Generate(void* buffer, uint8& size) const
 	else
 		packet->destination = destinationGroup.GetRaw();
 
-	packet->length = payloadSize;
+	packet->length = payloadSize + 1;
 	packet->tapci0 = tpci << 2 | ((uint16)apci & 0x0300);
 	packet->tapci1 = ((uint16)apci & 0x00FF);
 	
-
-
 	ACEMIAPCI trimmedACPI = GetAPCI();
 	if (trimmedACPI == ACEMIAPCI::GroupValueRead || trimmedACPI == ACEMIAPCI::GroupValueWrite || trimmedACPI == ACEMIAPCI::GroupValueResponse)
 		packet->tapci1 = packet->tapci1 | GetFirstPayload();
 
+	size += sizeof(ACEMIDataPacket);
+
 	uint8* bytes = (uint8*)buffer;
 	if (payloadSize != 0)
-		memcpy(bytes + sizeof(ACEMIDataPacket), payload, payloadSize);
+		memcpy(bytes + size, payload, payloadSize);
 
-	/*size = sizeof(ACEMIDataPacket) + GetPayloadSize();
-	uint8 checkSum = 0;
-	for (uint8 I = 0; I < size; I++)
-		checkSum ^= bytes[I];
-	bytes[size] = ~checkSum;
-	
-	size++;*/
+	size += payloadSize;
 }
 
 size_t ACEMIMessageData::Process(const void* buffer, size_t size)
@@ -485,12 +486,30 @@ size_t ACEMIMessageData::Process(const void* buffer, size_t size)
 	return offset;
 }
 
-std::string ACEMIMessageData::Print() const
+void ACEMIMessageData::Reset()
+{
+	frameFormat = ACEMIFrameFormat::Standard;
+	repeatFlag = false;
+	systemBroadcast = ACEMIBroadcastType::Broadcast;
+	priority = ACEMIPriority::Normal;
+	acknowledgeRequestFlag = false;
+	confirmFlag = false;
+	destAddressType = AAddressType::GroupAddress;
+	hopCount = 0;
+	extendedFrameFormat = 0;
+	firstPayload = 0;
+	payloadSize = 0;
+	tpci = 0x00;
+	apci = ACEMIAPCI::GroupValueWrite;
+	memset(payload, 0, sizeof(payload));
+}
+
+std::string ACEMIMessageData::ToString() const
 {
 	stringstream output;
 	char hexOutput[5];
 
-	output << ACEMIMessage::Print();
+	output << ACEMIMessage::ToString();
 
 	output << "  FrameFormat: " << (GetFrameFormat() == ACEMIFrameFormat::Standard ? "Standard" : "Extended") << "\n";
 	output << "  Repeat: " << (GetRepeatFlag() ? "True" : "False") << "\n";
@@ -712,18 +731,5 @@ std::string ACEMIMessageData::Print() const
 
 ACEMIMessageData::ACEMIMessageData()
 {
-	frameFormat = ACEMIFrameFormat::Standard;
-	repeatFlag = false;
-	systemBroadcast = ACEMIBroadcastType::Broadcast;
-	priority = ACEMIPriority::Normal;
-	acknowledgeRequestFlag = false;
-	confirmFlag = false;
-	destAddressType = AAddressType::GroupAddress;
-	hopCount = 0;
-	extendedFrameFormat = 0;
-	firstPayload = 0;
-	payloadSize = 0;
-	tpci = 0x00;
-	apci = ACEMIAPCI::GroupValueWrite;
-	memset(payload, 0, sizeof(payload));
+	Reset();
 }

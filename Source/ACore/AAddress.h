@@ -23,7 +23,7 @@ class AGroupAddress
 			struct
 			{
 				uint8			b : 3;
-				uint8			a : 4;
+				uint8			a : 5;
 				uint8			c : 8;
 			};
 			uint8				byte[2];
@@ -46,9 +46,8 @@ class AGroupAddress
 		bool					SetString(const char* value);
 		string					GetString() const;
 
-
-		bool					operator==(const AGroupAddress& other);
-		bool					operator!=(const AGroupAddress& other);
+		bool					operator==(const AGroupAddress& other) const;
+		bool					operator!=(const AGroupAddress& other) const;
 
 								AGroupAddress();
 								AGroupAddress(const char* value);
@@ -88,8 +87,8 @@ class AIndividualAddress
 		string					GetString() const;
 
 
-		bool					operator==(const AIndividualAddress& other);
-		bool					operator!=(const AIndividualAddress& other);
+		bool					operator==(const AIndividualAddress& other) const;
+		bool					operator!=(const AIndividualAddress& other) const;
 
 								AIndividualAddress();
 								AIndividualAddress(const char* value);

@@ -11,3 +11,6 @@
 
 void toHex(uint8 value, char* hexOutput);
 void toHex16(uint16 value, char* hexOutput);
+
+uint16 toHalf(float value);
+float toFloat(uint16 value);

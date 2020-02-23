@@ -1,3 +1,18 @@
+#include <half.hpp>
+
+unsigned short toHalf(float value)
+{
+	half_float::half temp(value);
+	return *(unsigned short*)&temp;
+}
+
+float toFloat(unsigned short value)
+{
+	half_float::half temp;
+	*(unsigned short*)&temp = value;
+	return temp;
+}
+
 #include "ATypes.h"
 
 void toHex(uint8 value, char* hexOutput)

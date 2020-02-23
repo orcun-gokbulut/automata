@@ -59,7 +59,9 @@ class AHIDReport
 		void						Generate(void* buffer, uint8& size) const;
 		bool						Process(const void* buffer, uint8 size);
 
-		std::string					Print() const;
+		void						Reset();
+
+		std::string					ToString() const;
 
 									AHIDReport();
 };

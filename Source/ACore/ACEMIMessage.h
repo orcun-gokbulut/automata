@@ -85,147 +85,150 @@ enum class ACEMIAPCI
 class ACEMIMessage
 {
 	private:
-		size_t						index;
+		size_t								index;
 
-		ACEMIMessageCode			messageCode;
-		uint8						additionalInfo[256];
-		uint8						additionalInfoSize;
+		ACEMIMessageCode					messageCode;
+		uint8								additionalInfo[256];
+		uint8								additionalInfoSize;
 
 	public:
-		void						SetIndex(size_t Index);
-		size_t						GetIndex() const;
+		void								SetIndex(size_t Index);
+		size_t								GetIndex() const;
 
-		void						SetMessageCode(ACEMIMessageCode code);
-		ACEMIMessageCode			GetMessageCode() const;
+		void								SetMessageCode(ACEMIMessageCode code);
+		ACEMIMessageCode					GetMessageCode() const;
 
-		void						SetAdditionalInfo(const void* data, uint8 size);
-		const void*					GetAdditionalInfo() const;
-		uint8						GetAdditionalInfoSize() const;
+		void								SetAdditionalInfo(const void* data, uint8 size);
+		const void*							GetAdditionalInfo() const;
+		uint8								GetAdditionalInfoSize() const;
 
-		void						Generate(void* buffer, uint8& size) const;
-		size_t						Process(const void* buffer, size_t size);
+		virtual void						Generate(void* buffer, uint8& size) const;
+		virtual size_t						Process(const void* buffer, size_t size);
 
-		std::string					Print() const;
+		virtual std::string					ToString() const;
 
-									ACEMIMessage();
+											ACEMIMessage();
+		virtual								~ACEMIMessage();
 };
 
 class ACEMIMessageData : public ACEMIMessage
 {
 	private:
-		ACEMIFrameFormat			frameFormat;
-		bool						repeatFlag;
-		ACEMIBroadcastType			systemBroadcast;
-		ACEMIPriority				priority;
-		bool						acknowledgeRequestFlag;
-		bool						confirmFlag;
-		AAddressType				destAddressType;
-		uint8						hopCount;
-		uint8						extendedFrameFormat;
+		ACEMIFrameFormat					frameFormat;
+		bool								repeatFlag;
+		ACEMIBroadcastType					systemBroadcast;
+		ACEMIPriority						priority;
+		bool								acknowledgeRequestFlag;
+		bool								confirmFlag;
+		AAddressType						destAddressType;
+		uint8								hopCount;
+		uint8								extendedFrameFormat;
 
-		AIndividualAddress			source;
-		AGroupAddress				destinationGroup;
-		AIndividualAddress			destinationIndividual;
+		AIndividualAddress					source;
+		AGroupAddress						destinationGroup;
+		AIndividualAddress					destinationIndividual;
 
-		uint8						tpci;
-		ACEMIAPCI					apci;
+		uint8								tpci;
+		ACEMIAPCI							apci;
 
-		uint8						firstPayload;
-		uint8						payload[256];
-		uint8						payloadSize;
+		uint8								firstPayload;
+		uint8								payload[256];
+		uint8								payloadSize;
 
 	public:
-		void						SetFrameFormat(ACEMIFrameFormat format);
-		ACEMIFrameFormat			GetFrameFormat() const;
+		void								SetFrameFormat(ACEMIFrameFormat format);
+		ACEMIFrameFormat					GetFrameFormat() const;
 
-		void						SetRepeatFlag(bool type);
-		bool						GetRepeatFlag() const;
+		void								SetRepeatFlag(bool type);
+		bool								GetRepeatFlag() const;
 
-		void						SetBroadcastType(ACEMIBroadcastType type);
-		ACEMIBroadcastType			GetBroadcastType() const;
+		void								SetBroadcastType(ACEMIBroadcastType type);
+		ACEMIBroadcastType					GetBroadcastType() const;
 
-		void						SetPriority(ACEMIPriority type);
-		ACEMIPriority				GetPriority() const;
+		void								SetPriority(ACEMIPriority type);
+		ACEMIPriority						GetPriority() const;
 
-		void						SetAcknowledgeRequestFlag(bool flag);
-		bool						GetAcknowledgeRequestFlag() const;
+		void								SetAcknowledgeRequestFlag(bool flag);
+		bool								GetAcknowledgeRequestFlag() const;
 
-		void						SetConfirmFlag(bool flag);
-		bool						GetConfirmFlag() const;
+		void								SetConfirmFlag(bool flag);
+		bool								GetConfirmFlag() const;
 
-		void						SetHopCount(uint8 count);
-		uint8						GetHopCount() const;
+		void								SetHopCount(uint8 count);
+		uint8								GetHopCount() const;
 
-		void						SetExtendedFrameFormat(uint8 format);
-		uint8						GetExtendedFrameFormat() const;
+		void								SetExtendedFrameFormat(uint8 format);
+		uint8								GetExtendedFrameFormat() const;
 
-		void						SetAddressType(AAddressType type);
-		AAddressType				GetAddressType() const;
+		void								SetAddressType(AAddressType type);
+		AAddressType						GetAddressType() const;
 
-		void						SetSource(const AIndividualAddress& address);
-		const AIndividualAddress&	GetSource() const;
+		void								SetSource(const AIndividualAddress& address);
+		const AIndividualAddress&			GetSource() const;
 
-		void						SetDestinationIndividual(const AIndividualAddress& address);
-		const AIndividualAddress&	GetDestinationInduvidual() const;
+		void								SetDestinationIndividual(const AIndividualAddress& address);
+		const AIndividualAddress&			GetDestinationInduvidual() const;
 
-		void						SetDestinationGroup(const AGroupAddress& address);
-		const AGroupAddress&		GetDestinationGroup() const;
+		void								SetDestinationGroup(const AGroupAddress& address);
+		const AGroupAddress&				GetDestinationGroup() const;
 
-		void						SetTPCI(uint8 value);
-		uint8						GetTPCI() const;
+		void								SetTPCI(uint8 value);
+		uint8								GetTPCI() const;
 
-		void						SetAPCI(ACEMIAPCI value);
-		ACEMIAPCI					GetAPCI() const;
+		void								SetAPCI(ACEMIAPCI value);
+		ACEMIAPCI							GetAPCI() const;
 
-		void						SetFirstPayload(uint8 payload);
-		uint8						GetFirstPayload() const;
+		void								SetFirstPayload(uint8 payload);
+		uint8								GetFirstPayload() const;
 
-		void						SetPayload(const void* data, uint8 size);
-		const void*					GetPayload() const;
-		uint8						GetPayloadSize() const;
+		void								SetPayload(const void* data, uint8 size);
+		const void*							GetPayload() const;
+		uint8								GetPayloadSize() const;
 
-		void						SetUInt8(uint8 value);
-		uint8						GetUInt8() const;
+		void								SetUInt8(uint8 value);
+		uint8								GetUInt8() const;
 
-		void						SetUInt16(uint16 value);
-		uint16						GetUInt16() const;
+		void								SetUInt16(uint16 value);
+		uint16								GetUInt16() const;
 
-		void						SetUInt32(uint32 value);
-		uint32						GetUInt32() const;
+		void								SetUInt32(uint32 value);
+		uint32								GetUInt32() const;
 
-		void						SetUInt64(uint64 value);
-		uint64						GetUInt64() const;
+		void								SetUInt64(uint64 value);
+		uint64								GetUInt64() const;
 
-		void						SetInt8(int8 value);
-		int8						GetInt8() const;
+		void								SetInt8(int8 value);
+		int8								GetInt8() const;
 
-		void						SetInt16(int16 value);
-		int16						GetInt16() const;
+		void								SetInt16(int16 value);
+		int16								GetInt16() const;
 
-		void						SetInt32(int32 value);
-		int32						GetInt32() const;
+		void								SetInt32(int32 value);
+		int32								GetInt32() const;
 
-		void						SetInt64(int64 value);
-		int64						GetInt64() const;
+		void								SetInt64(int64 value);
+		int64								GetInt64() const;
 
-		void						SetHalf(float value);
-		float						GetHalf() const;
+		void								SetHalfFloat(float value);
+		float								GetHalfFloat() const;
 
-		void						SetFloat(float value);
-		float						GetFloat() const;
+		void								SetFloat(float value);
+		float								GetFloat() const;
 
-		void						SetDouble(double value);
-		double						GetDouble() const;
+		void								SetDouble(double value);
+		double								GetDouble() const;
 
-		void						SetBoolean(bool value);
-		bool						GetBoolean() const;
+		void								SetBoolean(bool value);
+		bool								GetBoolean() const;
 
-		uint8						GetSize() const;
+		uint8								GetSize() const;
 
-		void						Generate(void* buffer, uint8& size) const;
-		size_t						Process(const void* buffer, size_t size);
+		virtual void						Generate(void* buffer, uint8& size) const;
+		virtual size_t						Process(const void* buffer, size_t size);
+		
+		void								Reset();
 
-		std::string					Print() const;
+		virtual std::string					ToString() const;
 
-									ACEMIMessageData();
+											ACEMIMessageData();
 };

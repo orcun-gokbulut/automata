@@ -148,6 +148,9 @@ void ACore::AddDevice(ADevice* device)
 
 	devices.insert(devices.end(), device);
 	device->core = this;
+
+	if (!device->IsInitialized())
+		device->Initialize();
 }
 
 void ACore::RemoveDevice(ADevice* device)
@@ -155,8 +158,21 @@ void ACore::RemoveDevice(ADevice* device)
 	CheckError(device == NULL, RETURN_VOID, "Cannot remove device from core. Device is NULL.");
 	CheckError(device->GetCore() == this, RETURN_VOID, "Cannot remove device from core. Device is not added to this core. Device Name: %s.", device->GetName());
 
+	if (device->IsInitialized())
+		device->Deinitialize();
+
 	devices.erase(std::find(devices.begin(), devices.end(), device));
 	device->core = nullptr;
+}
+
+void ACore::SetAddress(const AIndividualAddress& address)
+{
+	this->address = address;
+}
+
+const AIndividualAddress& ACore::GetAddress() const
+{
+	return address;
 }
 
 void ACore::SetPrintTelegrams(bool enabled)
@@ -200,12 +216,18 @@ bool ACore::Initialize()
 
 	Log("Core initialized.");
 
+	if (initializationCallback != nullptr)
+		initializationCallback(this);
+
 	return true;
 }
 
 bool ACore::Deinitialize()
 {
 	Log("Deinitializing core...");
+
+	if (deinitializationCallback != nullptr)
+		deinitializationCallback(this);
 
 	DeinitializeDevices();
 	DeinitializeInterface();
@@ -219,6 +241,9 @@ bool ACore::Deinitialize()
 
 void ACore::DispatchHIDPacket(const AHIDReport& packet)
 {
+	if (printHIDPackets)
+		cout << "INCOMMING " << packet.ToString();
+
 	if (packet.GetProtocolId() == 0x01 && packet.GetSize() > 0 && *(uint8*)packet.GetData() == 0x29)
 	{
 		ACEMIMessageData telegram;
@@ -228,14 +253,14 @@ void ACore::DispatchHIDPacket(const AHIDReport& packet)
 		telegramIndex++;
 		telegram.SetIndex(telegramIndex);
 
-		DispatchTelegram(telegram);
+		DispatchMessage(telegram);
 	}
 }
 
-void ACore::DispatchTelegram(const ACEMIMessageData& telegram)
+void ACore::DispatchMessage(const ACEMIMessage& message)
 {
 	if (printTelegrams)
-		cout << telegram.Print();
+		cout << "INCOMMING " << message.ToString();
 	
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
@@ -244,7 +269,7 @@ void ACore::DispatchTelegram(const ACEMIMessageData& telegram)
 		if (!currentDevice->IsInitialized())
 			continue;
 
-		currentDevice->TelegramReceived(&telegram);
+		currentDevice->TelegramReceived(message);
 	}
 }
 
@@ -253,28 +278,39 @@ bool ACore::SendPacket(const AHIDReport& packet)
 	uint8 size;
 	uint8 packetBuffer[256];
 	packet.Generate(packetBuffer, size);
+	
+	if (printHIDPackets)
+		cout << "OUTGOING " << packet.ToString();
+
 	int bytesSend = hid_write(interfaceDevice, packetBuffer, size);
 	CheckError(bytesSend < size, false, "Cannot send packet.");
+
 
 	return true;
 }
 
-bool ACore::SendTelegram(const ACEMIMessageData& telegram)
+bool ACore::SendMessage(const ACEMIMessage& message)
 {
 	CheckError(!IsInitialized(), false, "Cannot send telegram. Core is not initialized.");
 
-	uint8 telegramBuffer[256];
-	uint8 size;
-	telegram.Generate(telegramBuffer, size);
+	uint8 buffer[256];
+	uint8 size = 0;
+	message.Generate(buffer, size);
+
+	if (printTelegrams)
+		cout << "OUTGOING " << message.ToString();
 
 	AHIDReport packet;
-	packet.SetData(telegramBuffer, size);
+	packet.SetData(buffer, size);
 	return SendPacket(packet);
 }
 
 void ACore::Process()
 {
 	CheckError(!IsInitialized(), RETURN_VOID, "Cannot process core. Core is not initialized.");
+
+	if (preLoopCallback != nullptr)
+		preLoopCallback(this);
 
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
@@ -306,6 +342,9 @@ void ACore::Process()
 
 		currentDevice->PostProcess();
 	}
+
+	if (postLoopCallback != nullptr)
+		postLoopCallback(this);
 }
 
 void ACore::Execute()
@@ -314,6 +353,46 @@ void ACore::Execute()
 
 	while (true)
 		Process();
+}
+
+void ACore::SetInitializationCallback(const ACoreInitializedCallback& callback)
+{
+	initializationCallback = callback;
+}
+
+const ACoreInitializedCallback& ACore::GetInitializationCallback() const
+{
+	return initializationCallback;
+}
+
+void ACore::SetDeinitializationCallback(const ACoreDeinitializedCallback& callback)
+{
+	deinitializationCallback = callback;
+}
+
+const ACoreDeinitializedCallback& ACore::GetDeinitializationCallback() const
+{
+	return deinitializationCallback;
+}
+
+void ACore::SetPreLoopCallback(const ACorePreLoopCallback& callback)
+{
+	preLoopCallback = callback;
+}
+
+const ACorePreLoopCallback& ACore::GetPreLoopCallback() const
+{
+	return preLoopCallback;
+}
+
+void ACore::SetPostLoopCallback(const ACorePostLoopCallback& callback)
+{
+	postLoopCallback = callback;
+}
+
+const ACorePostLoopCallback& ACore::GetPostLoopCallback() const
+{
+	return postLoopCallback;
 }
 
 ACore::ACore()
