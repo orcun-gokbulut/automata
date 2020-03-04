@@ -24,7 +24,6 @@ struct AHIDReportBody
 	uint8					protocolId;
 	uint8					EMIId;
 	uint16					manufacturerCode;
-	uint8					EMIMessageCode;
 };
 
 #pragma pack(pop)

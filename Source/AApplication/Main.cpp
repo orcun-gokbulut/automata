@@ -2,13 +2,23 @@
 #include "ACore/ADeviceSwitch.h"
 
 #include <string.h>
+#include <future>
+#include <iostream>
+#include <chrono>
+
+std::string GetLineFromCin() 
+{
+	std::string line;
+	std::getline(std::cin, line);
+	return line;
+}
 
 int main(int argc, const char** argv)
 {
 	ACore core;
 	core.SetAddress(AIndividualAddress(2, 1, 1));
 	core.SetPrintHIDPackets(true);
-	core.SetPrintTelegrams(true);
+	core.SetPrintMessages(true);
 
 	ADeviceSwitch* salonYemekAvize = new ADeviceSwitch();
 	salonYemekAvize->SetName("Salon-YemekAlani-Avize");
@@ -26,11 +36,22 @@ int main(int argc, const char** argv)
 	salonOturmaAvize->SetDimLevelStatusAddress(AGroupAddress(5, 1, 9));
 	core.AddDevice(salonOturmaAvize);
 
-	core.SetInitializationCallback(
-		[salonOturmaAvize](ACore* core) 
+	core.SetPreLoopCallback(
+		[salonOturmaAvize](ACore* core)
 		{
-			salonOturmaAvize->SetDim(0.5);
-			salonOturmaAvize->SetOnOff(true);
+			static auto future = std::async(std::launch::async, GetLineFromCin);
+			if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) 
+			{
+				auto line = future.get();
+				future = std::async(std::launch::async, GetLineFromCin);
+				if (line == "send")
+				{
+					salonOturmaAvize->SetDim(0.5);
+					salonOturmaAvize->SetOnOff(true);
+				}
+				std::cout << "you wrote " << line << std::endl;
+			}
+
 		}
 	);
 

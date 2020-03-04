@@ -4,9 +4,9 @@
 
 #define Log(Message, ...) do { AConsole::Output(AOutputType::Log, __FUNCTION__, Message, __VA_ARGS__); } while(false)
 
-#define RaiseCriticalError(Message, ...) do { AConsole::Output(AOutputType::CriticalError, "",  Message, __VA_ARGS__); } while(false)
-#define RaiseError(Message, ...) do { AConsole::Output(AOutputType::Error, "", Message, __VA_ARGS__); } while(false)
-#define RaiseWarning(Message, ...) do { AConsole::Output(AOutputType::Warning, "", Message, __VA_ARGS__); } while(false)
+#define RaiseCriticalError(Message, ...) do { AConsole::Output(AOutputType::CriticalError, __FUNCTION__,  Message, __VA_ARGS__); } while(false)
+#define RaiseError(Message, ...) do { AConsole::Output(AOutputType::Error, __FUNCTION__, Message, __VA_ARGS__); } while(false)
+#define RaiseWarning(Message, ...) do { AConsole::Output(AOutputType::Warning, __FUNCTION__, Message, __VA_ARGS__); } while(false)
 
 #define CheckCriticalError(Condition, Message, ...) do { if (Condition) { RaiseError(Message, __VA_ARGS__); AConsole::Abort(); }} while(false)
 #define CheckError(Condition, Return, Message, ...) do { if (Condition) { RaiseError(Message, __VA_ARGS__); return Return; }} while(false)

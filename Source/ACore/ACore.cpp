@@ -5,9 +5,11 @@
 #include "ACEMIMessage.h"
 
 #include "ACommon/AError.h"
+#include "ACommon/AEndian.h"
 
 #include <iostream>
 #include <hidapi.h>
+
 
 using namespace std;
 
@@ -61,7 +63,7 @@ bool ACore::InitializeInterface()
 	uint16 vendorId = 0;
 	while (currentDeviceInfo != nullptr)
 	{
-		Log("Enumerating device. Manufacturer: %ls. Product: %ls. VID: %04hx. PID: %04hx.",
+		Log("  Enumerating device. Manufacturer: %ls. Product: %ls. VID: %04hx. PID: %04hx.",
 			currentDeviceInfo->manufacturer_string,
 			currentDeviceInfo->product_string,
 			currentDeviceInfo->vendor_id,
@@ -69,15 +71,15 @@ bool ACore::InitializeInterface()
 
 		if (currentDeviceInfo->vendor_id == 0x28c2 && currentDeviceInfo->product_id == 0x0017)
 		{
-			Log("USB KNX Interface device found.\n"
-				"  Vendor Id:     %04hx\n"
-				"  Product Id:    %04hx\n"
-				"  Serial Number: %ls\n"
-				"  Manufacturer:  %ls\n"
-				"  Product:       %ls\n"
-				"  Release:       %hx\n"
-				"  Interface:     %d\n"
-				"  Path:          %ls",
+			Log("  USB KNX Interface device found.\n"
+				"    Vendor Id:     %04hx\n"
+				"    Product Id:    %04hx\n"
+				"    Serial Number: %ls\n"
+				"    Manufacturer:  %ls\n"
+				"    Product:       %ls\n"
+				"    Release:       %hx\n"
+				"    Interface:     %d\n"
+				"    Path:          %ls",
 				currentDeviceInfo->vendor_id,
 				currentDeviceInfo->product_id,
 				currentDeviceInfo->serial_number,
@@ -90,7 +92,7 @@ bool ACore::InitializeInterface()
 			vendorId = currentDeviceInfo->vendor_id;
 			productId = currentDeviceInfo->product_id;
 			
-			//break;
+			break;
 		}
 
 		currentDeviceInfo = currentDeviceInfo->next;
@@ -99,17 +101,47 @@ bool ACore::InitializeInterface()
 
 	CheckError(productId == 0 && vendorId == 0, false, "Cannot initialize interface. No KNX USB Interface device has been found.");
 
+
 	interfaceDevice = hid_open(vendorId, productId, NULL);
 	CheckError(interfaceDevice == nullptr, false, "Cannot initialize interface. Cannot open interface device.");
 
 	//hid_set_nonblocking(interfaceDevice, 1);
 
-	AHIDReport packet;
-	packet.SetProtocolId(0x0F);
-	packet.SetEMIId(0x01);
-	uint8 data = 0x01;
-	packet.SetData(&data, 1);
-	SendPacket(packet);
+	Log("Initializing HID Device...");
+
+	uint16 supportedEMIs = 0;
+	SendServiceQuery(0x01, 0x01, nullptr, 0, &supportedEMIs, 2);
+	supportedEMIs = bswap_16(supportedEMIs);
+
+	Log("Supported EMIs : %s%s%s",
+		(supportedEMIs & 0x0001) ? "EMI1 " : "",
+		(supportedEMIs & 0x0002) ? "EMI2 " : "",
+		(supportedEMIs & 0x0004) ? "cEMI " : "");
+
+	if ((supportedEMIs & 0x0004) != 0x0004)
+	{
+		RaiseError("Device does not support cEMI. Cannot initialize interface.");
+		hid_close(interfaceDevice);
+		return false;
+	}
+	
+	uint8 currentEMI = 0;
+	SendServiceQuery(0x01, 0x04, nullptr, 0, &currentEMI, 1);
+	Log("Active EMI : %s%s%s%s.",
+		currentEMI == 1 ? "EMI1 " : "",
+		currentEMI == 2 ? "EMI2 " : "",
+		currentEMI == 3 ? "cEMI " : "",
+		currentEMI == 0 || currentEMI > 3 ? "UNKNOWN" : "");
+
+	if (currentEMI != 0x03)
+	{
+		Log("Changing EMI to cEMI.");
+		
+		currentEMI = 0x03;
+		SendServiceCommand(0x03, 0x05, &currentEMI, 1);
+	}
+
+	Log("HID Device initialized.");
 
 	return true;
 }
@@ -123,6 +155,41 @@ bool ACore::DeinitializeInterface()
 	hid_exit();
 
 	return true;
+}
+
+void ACore::SendServiceCommand(uint8 service, uint8 feature, const void* parameter, size_t parameterSize)
+{
+	AHIDReport packet;
+	packet.SetProtocolId(AHIDProtocolId::BusAccessServerFeatureService);
+	packet.SetEMIId(service);
+	packet.AddData(&feature, 1);
+	packet.AddData(parameter, parameterSize);
+	SendHIDReport(packet);
+}
+
+void ACore::SendServiceQuery(uint8 service, uint8 feature, const void* parameter, size_t parameterSize, void* output, size_t outputSize, uint32 timeOut)
+{
+	SendServiceCommand(service, feature, parameter, parameterSize);
+
+	AHIDReport outputReport;
+	while (true)
+	{
+		if (!ReceiveHIDReport(outputReport))
+			continue;
+
+		if (outputReport.GetProtocolId() == AHIDProtocolId::BusAccessServerFeatureService &&
+			outputReport.GetEMIId() == 0x02 &&
+			outputReport.GetDataSize() != 0 &&
+			*(uint8*)outputReport.GetData() == feature)
+		{
+			memcpy(output, (uint8*)outputReport.GetData() + 1, outputSize);
+			break;
+		}
+		else
+		{
+			DispatchHIDReport(outputReport);
+		}
+	}
 }
 
 const std::vector<ADevice*>& ACore::GetDevices() const
@@ -175,14 +242,14 @@ const AIndividualAddress& ACore::GetAddress() const
 	return address;
 }
 
-void ACore::SetPrintTelegrams(bool enabled)
+void ACore::SetPrintMessages(bool enabled)
 {
-	printTelegrams = enabled;
+	printMessages = enabled;
 }
 
-bool ACore::GetPrintTelegrams() const
+bool ACore::GetPrintMessages() const
 {
-	return printTelegrams;
+	return printMessages;
 }
 
 void ACore::SetPrintHIDPackets(bool enabled)
@@ -193,6 +260,19 @@ void ACore::SetPrintHIDPackets(bool enabled)
 bool ACore::GetPrintHIDPackets() const
 {
 	return printHIDPackets;
+}
+
+void ACore::QueryBusStatus()
+{
+	uint8 command = 0x03;
+	bool output;
+	SendServiceQuery(0x01, 0x03, nullptr, 0, &output, 1);
+}
+
+bool ACore::GetBusStatus()
+{
+	return busStatus;
+
 }
 
 bool ACore::IsInitialized()
@@ -239,27 +319,39 @@ bool ACore::Deinitialize()
 	return true;
 }
 
-void ACore::DispatchHIDPacket(const AHIDReport& packet)
+void ACore::DispatchHIDReport(const AHIDReport& report)
 {
-	if (printHIDPackets)
-		cout << "INCOMMING " << packet.ToString();
-
-	if (packet.GetProtocolId() == 0x01 && packet.GetSize() > 0 && *(uint8*)packet.GetData() == 0x29)
+	if (!initialized)
+		return;
+	if (report.GetProtocolId() == AHIDProtocolId::BusAccessServerFeatureService)
 	{
-		ACEMIMessageData telegram;
-		if (!telegram.Process(packet.GetData(), packet.GetDataSize()))
-			return;
+		if (report.GetEMIId() == 0x04 && report.GetDataSize() == 2 && *(uint8*)report.GetData() == 0x03)
+		{
+			busStatus = (bool)((uint8*)report.GetData())[1];
+		}
+	}
+	else if (report.GetProtocolId() == AHIDProtocolId::KNXTunnel)
+	{
+		if (report.GetDataSize() > 0 && *(uint8*)report.GetData() == 0x29)
+		{
+			ACEMIMessageData telegram;
+			if (!telegram.Process(report.GetData(), report.GetDataSize()))
+				return;
 
-		telegramIndex++;
-		telegram.SetIndex(telegramIndex);
+			telegramIndex++;
+			telegram.SetIndex(telegramIndex);
 
-		DispatchMessage(telegram);
+			DispatchMessage(telegram);
+		}
 	}
 }
 
 void ACore::DispatchMessage(const ACEMIMessage& message)
 {
-	if (printTelegrams)
+	if (!initialized)
+		return;
+
+	if (printMessages)
 		cout << "INCOMMING " << message.ToString();
 	
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
@@ -273,20 +365,37 @@ void ACore::DispatchMessage(const ACEMIMessage& message)
 	}
 }
 
-bool ACore::SendPacket(const AHIDReport& packet)
+bool ACore::SendHIDReport(const AHIDReport& report)
 {
 	uint8 size;
 	uint8 packetBuffer[256];
-	packet.Generate(packetBuffer, size);
+	report.Generate(packetBuffer, size);
+	AHIDReport regenerate;
+	regenerate.Process(packetBuffer, size);
 	
 	if (printHIDPackets)
-		cout << "OUTGOING " << packet.ToString();
+		cout << "OUTGOING " << report.ToString();
 
 	int bytesSend = hid_write(interfaceDevice, packetBuffer, size);
 	CheckError(bytesSend < size, false, "Cannot send packet.");
 
-
 	return true;
+}
+
+bool ACore::ReceiveHIDReport(AHIDReport& report, uint32 timeout)
+{
+	uint8 buffer[1024];
+	uint8* cursor = buffer;
+	int bytesReceived = hid_read_timeout(interfaceDevice, buffer, 1024, timeout);
+	if (bytesReceived == 0)
+		return false;
+	
+	bool result = report.Process(buffer, bytesReceived);
+
+	if (result && printHIDPackets)
+		cout << "INCOMMING " << report.ToString();
+
+	return result;
 }
 
 bool ACore::SendMessage(const ACEMIMessage& message)
@@ -297,12 +406,12 @@ bool ACore::SendMessage(const ACEMIMessage& message)
 	uint8 size = 0;
 	message.Generate(buffer, size);
 
-	if (printTelegrams)
-		cout << "OUTGOING " << message.ToString();
+	if (printMessages)
+		cout << "INCOMMING " << message.ToString();
 
-	AHIDReport packet;
-	packet.SetData(buffer, size);
-	return SendPacket(packet);
+	AHIDReport report;
+	report.SetData(buffer, size);
+	return SendHIDReport(report);
 }
 
 void ACore::Process()
@@ -321,18 +430,13 @@ void ACore::Process()
 		currentDevice->PreProcess();
 	}
 
-	uint8 buffer[1024];
-	uint8* cursor = buffer;
-	int bytesReceived = hid_read_timeout(interfaceDevice, buffer, 1024, 100);
-	if (bytesReceived == 0)
-		return;
-
 	AHIDReport packet;
-	packet.Process(buffer, bytesReceived);
-
-	HIDPacketIndex++;
-	packet.SetIndex(HIDPacketIndex);
-	DispatchHIDPacket(packet);
+	if (ReceiveHIDReport(packet))
+	{
+		HIDPacketIndex++;
+		packet.SetIndex(HIDPacketIndex);
+		DispatchHIDReport(packet);
+	}
 
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
@@ -402,7 +506,7 @@ ACore::ACore()
 
 	interfaceDevice = nullptr;
 	initialized = false;
-	printTelegrams = false;
+	printMessages = false;
 	printHIDPackets = false;
 }
 

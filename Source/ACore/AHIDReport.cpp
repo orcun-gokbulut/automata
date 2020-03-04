@@ -2,8 +2,10 @@
 
 #include "AHIDProtocol.h"
 
+#include "ACommon/AEndian.h"
+#include "ACommon/AError.h"
+
 #include <sstream>
-#include <ACommon\AError.h>
 
 void AHIDReport::SetIndex(uint64 index)
 {
@@ -93,7 +95,16 @@ void AHIDReport::SetData(const void* data, uint8 size)
 	if (size != 0)
 		SetDataSize(size);
 
-	memcpy(this->data, data, GetDataSize());
+	memcpy_s(this->data, sizeof(this->data), data, GetDataSize());
+}
+
+void AHIDReport::AddData(const void* data, uint8 size)
+{
+	if (data == nullptr || size == 0)
+		return;
+
+	memcpy(this->data + dataSize, data, size);
+	dataSize += size;
 }
 
 const void* AHIDReport::GetData() const
@@ -101,17 +112,12 @@ const void* AHIDReport::GetData() const
 	return data;
 }
 
-size_t AHIDReport::GetSize() const
-{
-	return GetDataSize() + 11;
-}
-
-void AHIDReport::SetProtocolId(uint8 id)
+void AHIDReport::SetProtocolId(AHIDProtocolId id)
 {
 	protocolId = id;
 }
 
-uint8 AHIDReport::GetProtocolId() const
+AHIDProtocolId AHIDReport::GetProtocolId() const
 {
 	return protocolId;
 }
@@ -153,13 +159,13 @@ void AHIDReport::Generate(void* buffer, uint8& size) const
 	AHIDReportBody* body = (AHIDReportBody*)((uint8*)buffer + size);
 	body->protocolVersion = GetProtocolVersion();
 	body->headerLength = 8;
-	body->bodyLenght = (uint16)GetDataSize() << 8;
+	body->bodyLenght = bswap_16((uint16)GetDataSize());
 	body->EMIId = GetEMIId();
-	body->protocolId = GetProtocolId();
+	body->protocolId = (uint8)GetProtocolId();
 	body->manufacturerCode = GetManufacturerCode();
 	size += sizeof(AHIDReportBody);
 
-	void* data = (AHIDReportBody*)((uint8*)buffer + size);
+	void* data = (uint8*)buffer + size;
 	memcpy(data, GetData(), GetDataSize());
 	
 	size += GetDataSize();
@@ -168,20 +174,20 @@ void AHIDReport::Generate(void* buffer, uint8& size) const
 bool AHIDReport::Process(const void* buffer, uint8 size)
 {
 	AHIDReportHeader* header = (AHIDReportHeader*)buffer;
-	AHIDReportBody* body = (AHIDReportBody*)((uint8*)buffer + 3);
-
 	SetReportID(header->reportID);
 	SetStartPacket(header->startPacket);
 	SetEndPacket(header->endPacket);
 	SetPartialPacket(header->partialPacket);
 	SetSequenceNumber(header->sequenceNumber);
+
+	AHIDReportBody* body = (AHIDReportBody*)((uint8*)buffer + sizeof(AHIDReportHeader));
 	SetProtocolVersion(body->protocolVersion);
-	SetProtocolId(body->protocolId);
+	SetProtocolId((AHIDProtocolId)body->protocolId);
 	SetEMIId(body->EMIId);
 	SetManufacturerCode(body->manufacturerCode);
 
-	uint8* dataBuffer = (uint8*)body + 8;
-	SetData(dataBuffer, body->bodyLenght >> 8);
+	uint8* dataBuffer = (uint8*)body + sizeof(AHIDReportBody);
+	SetData(dataBuffer, bswap_16(body->bodyLenght));
 
 	return true;
 }
@@ -195,7 +201,7 @@ void AHIDReport::Reset()
 	partialPacket = false;
 	sequenceNumber = 0x01;
 	protocolVersion = 0x00;
-	protocolId = 0x01;
+	protocolId = AHIDProtocolId::KNXTunnel;
 	EMIId = 0x03;
 	manufacturerCode = 0x0000;
 	dataSize = 0;
@@ -217,16 +223,10 @@ std::string AHIDReport::ToString() const
 	output << "  Protocol Id: ";
 	switch (protocolId)
 	{
-		case 0x01:
+		case AHIDProtocolId::KNXTunnel:
 			output << "KNX Tunnel (0x01)";
 			break;
-		case 0x02:
-			output << "M-Bus Tunnel (0x02 - Not Supported)";
-			break;
-		case 0x03:
-			output << "Batibus Tunnel (0x03 - Not Supported)";
-			break;
-		case 0x0F:
+		case AHIDProtocolId::BusAccessServerFeatureService:
 			output << "Bus Access (0x0F)";
 			break;
 		default:

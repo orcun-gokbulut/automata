@@ -24,9 +24,9 @@ class ACore
 		hid_device_*						interfaceDevice;
 		size_t								telegramIndex;
 		size_t								HIDPacketIndex;
-
+		bool								busStatus;
 		bool								printHIDPackets;
-		bool								printTelegrams;
+		bool								printMessages;
 
 		bool								initialized;
 
@@ -41,6 +41,9 @@ class ACore
 		bool								InitializeInterface();
 		bool								DeinitializeInterface();
 
+		void								SendServiceCommand(uint8 command, uint8 feature, const void* parameter, size_t parameterSize);
+		void								SendServiceQuery(uint8 command, uint8 feature, const void* parameter, size_t parameterSize, void* output, size_t outputSize, uint32 timeout = 1000);
+
 	public:
 		const std::vector<ADevice*>&		GetDevices() const;
 		ADevice*							GetDevice(const char* Name) const;
@@ -50,20 +53,25 @@ class ACore
 		void								SetAddress(const AIndividualAddress& address);
 		const AIndividualAddress&			GetAddress() const;
 
-		void								SetPrintTelegrams(bool enabled);
-		bool								GetPrintTelegrams() const;
+		void								SetPrintMessages(bool enabled);
+		bool								GetPrintMessages() const;
 
 		void								SetPrintHIDPackets(bool enabled);
 		bool								GetPrintHIDPackets() const;
+
+		void								QueryBusStatus();
+		bool								GetBusStatus();
 
 		bool								IsInitialized();
 		bool								Initialize();
 		bool								Deinitialize();
 
-		void								DispatchHIDPacket(const AHIDReport& packet);
+		void								DispatchHIDReport(const AHIDReport& report);
 		void								DispatchMessage(const ACEMIMessage& message);
 
-		bool								SendPacket(const AHIDReport& packet);
+		bool								SendHIDReport(const AHIDReport& report);
+		bool								ReceiveHIDReport(AHIDReport& report, uint32 timeout = 100);
+
 		bool								SendMessage(const ACEMIMessage& message);
 
 		void								Process();

@@ -4,6 +4,12 @@
 
 #include <string>
 
+enum class AHIDProtocolId : uint8
+{
+	KNXTunnel = 0x01,
+	BusAccessServerFeatureService = 0x0F,
+};
+
 class AHIDReport
 {
 	private:
@@ -14,7 +20,7 @@ class AHIDReport
 		bool						partialPacket;
 		uint8						sequenceNumber;
 		uint8						protocolVersion;
-		uint8						protocolId;
+		AHIDProtocolId				protocolId;
 		uint8						EMIId;
 		uint16						manufacturerCode;
 		uint8						dataSize;
@@ -39,8 +45,8 @@ class AHIDReport
 		void						SetProtocolVersion(uint8 version);
 		uint8						GetProtocolVersion() const;
 
-		void						SetProtocolId(uint8 protocolId);
-		uint8						GetProtocolId() const;
+		void						SetProtocolId(AHIDProtocolId protocolId);
+		AHIDProtocolId				GetProtocolId() const;
 
 		void						SetEMIId(uint8 EMIId);
 		uint8						GetEMIId() const;
@@ -51,10 +57,9 @@ class AHIDReport
 		void						SetDataSize(uint8 size);
 		uint8						GetDataSize() const;
 
-		void						SetData(const void* data, uint8 size = 0);
+		void						SetData(const void* data, uint8 size);
+		void						AddData(const void* data, uint8 size);
 		const void*					GetData() const;
-
-		size_t						GetSize() const;
 
 		void						Generate(void* buffer, uint8& size) const;
 		bool						Process(const void* buffer, uint8 size);
