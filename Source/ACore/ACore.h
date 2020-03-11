@@ -22,8 +22,6 @@ class ACore
 		AIndividualAddress					address;
 		std::vector<ADevice*>				devices;
 		hid_device_*						interfaceDevice;
-		size_t								telegramIndex;
-		size_t								HIDPacketIndex;
 		bool								busStatus;
 		bool								printHIDPackets;
 		bool								printMessages;

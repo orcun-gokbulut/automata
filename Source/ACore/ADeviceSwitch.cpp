@@ -110,8 +110,8 @@ ADeviceSwitch::ADeviceSwitch()
 	dimLevelControl.SetOnUpdated([this](const ADataPoint& datapoint, const ACEMIMessageData& message) {this->OnDimLevelUpdated(message);});
 	RegisterDataPoint(&dimLevelControl);
 
-	dimLevelControl.SetType(ADataPointType::UInt8);
-	dimLevelControl.SetOnUpdated([this](const ADataPoint& datapoint, const ACEMIMessageData& message) {this->OnDimLevelUpdated(message);});
+	dimLevelStatus.SetType(ADataPointType::UInt8);
+	dimLevelStatus.SetOnUpdated([this](const ADataPoint& datapoint, const ACEMIMessageData& message) {this->OnDimLevelUpdated(message);});
 	RegisterDataPoint(&dimLevelStatus);
 }
 

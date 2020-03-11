@@ -12,8 +12,9 @@ enum class AHIDProtocolId : uint8
 
 class AHIDReport
 {
+	friend class ACore;
 	private:
-		uint64						index;
+		mutable uint64				index;
 		uint8						reportID;
 		bool						startPacket;
 		bool						endPacket;
@@ -26,8 +27,9 @@ class AHIDReport
 		uint8						dataSize;
 		uint8						data[256];
 
+		void						SetIndex(uint64 index) const;
+
 	public:
-		void						SetIndex(uint64 index);
 		uint64						GetIndex() const;
 
 		void						SetReportID(uint8 id);

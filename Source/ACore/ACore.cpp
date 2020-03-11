@@ -126,7 +126,7 @@ bool ACore::InitializeInterface()
 	}
 	
 	uint8 currentEMI = 0;
-	SendServiceQuery(0x01, 0x04, nullptr, 0, &currentEMI, 1);
+	SendServiceQuery(0x01, 0x05, nullptr, 0, &currentEMI, 1);
 	Log("Active EMI : %s%s%s%s.",
 		currentEMI == 1 ? "EMI1 " : "",
 		currentEMI == 2 ? "EMI2 " : "",
@@ -140,6 +140,26 @@ bool ACore::InitializeInterface()
 		currentEMI = 0x03;
 		SendServiceCommand(0x03, 0x05, &currentEMI, 1);
 	}
+
+	Log("Setting Active Layer to Data Link Layer.");
+	ACEMIMessageProperty propertyMessage;
+	propertyMessage.SetMessageCode(ACEMIMessageCode::PropertyWriteRequest);
+	propertyMessage.SetInterfaceObjectType(8);
+	propertyMessage.SetObjectInstance(1);
+	propertyMessage.SetPropertyId(52);
+	propertyMessage.SetRequestArraySize(false);
+	propertyMessage.SetArraySize(1);
+	propertyMessage.SetArrayStartIndex(1);
+	propertyMessage.SetArrayElementSize(1);
+	uint8 data = 0x00;
+	propertyMessage.SetArrayElement(0, &data);
+	SendMessage(propertyMessage);
+
+	Log("Setting Data Layer Transparancy Mode.");
+	data = 0x01;
+	propertyMessage.SetPropertyId(56);
+	propertyMessage.SetArrayElement(0, &data);
+	SendMessage(propertyMessage);
 
 	Log("HID Device initialized.");
 
@@ -332,16 +352,45 @@ void ACore::DispatchHIDReport(const AHIDReport& report)
 	}
 	else if (report.GetProtocolId() == AHIDProtocolId::KNXTunnel)
 	{
-		if (report.GetDataSize() > 0 && *(uint8*)report.GetData() == 0x29)
+		static uint64 index = 0;
+		index++;
+
+		ACEMIMessageCode code = (ACEMIMessageCode) * (uint8*)report.GetData();
+		switch (code)
 		{
-			ACEMIMessageData telegram;
-			if (!telegram.Process(report.GetData(), report.GetDataSize()))
-				return;
+			case ACEMIMessageCode::DataReceived:
+			case ACEMIMessageCode::DataTransmitRequest:
+			case ACEMIMessageCode::DataTransmitConfirmation:
+			{
+				ACEMIMessageData dataMessage;
+				if (!dataMessage.Process(report.GetData(), report.GetDataSize()))
+					return;
 
-			telegramIndex++;
-			telegram.SetIndex(telegramIndex);
+				dataMessage.SetIndex(index);
 
-			DispatchMessage(telegram);
+				if (printMessages)
+					cout << "INCOMMING " << dataMessage.ToString();
+
+				DispatchMessage(dataMessage);
+				break;
+			}
+
+			case ACEMIMessageCode::PropertyReadRequest:
+			case ACEMIMessageCode::PropertyReadConfirmation:
+			case ACEMIMessageCode::PropertyWriteRequest:
+			case ACEMIMessageCode::PropertyWriteConfirmation:
+			{
+				ACEMIMessageProperty propertyMessage;
+				if (!propertyMessage.Process(report.GetData(), report.GetDataSize()))
+					return;
+
+				propertyMessage.SetIndex(index);
+
+				if (printMessages)
+					cout << "INCOMMING " << propertyMessage.ToString();
+
+				break;
+			}
 		}
 	}
 }
@@ -351,9 +400,6 @@ void ACore::DispatchMessage(const ACEMIMessage& message)
 	if (!initialized)
 		return;
 
-	if (printMessages)
-		cout << "INCOMMING " << message.ToString();
-	
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
@@ -367,12 +413,14 @@ void ACore::DispatchMessage(const ACEMIMessage& message)
 
 bool ACore::SendHIDReport(const AHIDReport& report)
 {
+	static uint64 index = 0;
+	index++;
+
 	uint8 size;
 	uint8 packetBuffer[256];
 	report.Generate(packetBuffer, size);
-	AHIDReport regenerate;
-	regenerate.Process(packetBuffer, size);
-	
+	report.SetIndex(index);
+
 	if (printHIDPackets)
 		cout << "OUTGOING " << report.ToString();
 
@@ -390,24 +438,33 @@ bool ACore::ReceiveHIDReport(AHIDReport& report, uint32 timeout)
 	if (bytesReceived == 0)
 		return false;
 	
-	bool result = report.Process(buffer, bytesReceived);
+	if (!report.Process(buffer, bytesReceived))
+		return false;
+	
+	static uint64 index = 0;
+	index++;
+	report.SetIndex(index);
 
-	if (result && printHIDPackets)
+	if (printHIDPackets)
 		cout << "INCOMMING " << report.ToString();
 
-	return result;
+	return true;
 }
 
 bool ACore::SendMessage(const ACEMIMessage& message)
 {
-	CheckError(!IsInitialized(), false, "Cannot send telegram. Core is not initialized.");
+	//CheckError(!IsInitialized(), false, "Cannot send telegram. Core is not initialized.");
+
+	static uint64 index = 0;
+	index++;
 
 	uint8 buffer[256];
 	uint8 size = 0;
 	message.Generate(buffer, size);
+	message.SetIndex(index);
 
 	if (printMessages)
-		cout << "INCOMMING " << message.ToString();
+		cout << "OUTGOING " << message.ToString();
 
 	AHIDReport report;
 	report.SetData(buffer, size);
@@ -432,11 +489,7 @@ void ACore::Process()
 
 	AHIDReport packet;
 	if (ReceiveHIDReport(packet))
-	{
-		HIDPacketIndex++;
-		packet.SetIndex(HIDPacketIndex);
 		DispatchHIDReport(packet);
-	}
 
 	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
 	{
@@ -501,9 +554,6 @@ const ACorePostLoopCallback& ACore::GetPostLoopCallback() const
 
 ACore::ACore()
 {
-	telegramIndex = 0;
-	HIDPacketIndex = 0;
-
 	interfaceDevice = nullptr;
 	initialized = false;
 	printMessages = false;

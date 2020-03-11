@@ -11,10 +11,13 @@
 
 enum class ACEMIMessageCode : uint8
 {
-	Data_Received = 29,
-	Data_Transmit = 11,
-	Poll_Received = 9,
-	Poll_Transmit = 3
+	DataReceived = 0x29,
+	DataTransmitRequest = 0x11,
+	DataTransmitConfirmation = 0x2E,
+	PropertyReadRequest = 0xFC,
+	PropertyReadConfirmation = 0xFB,
+	PropertyWriteRequest = 0xF6,
+	PropertyWriteConfirmation = 0xF5
 };
 
 enum class ACEMIFrameFormat : uint8
@@ -85,22 +88,17 @@ enum class ACEMIAPCI
 class ACEMIMessage
 {
 	private:
-		size_t								index;
-
+		friend class ACore;
+		mutable uint64						index;
 		ACEMIMessageCode					messageCode;
-		uint8								additionalInfo[256];
-		uint8								additionalInfoSize;
+
+		void								SetIndex(uint64 Index) const;
 
 	public:
-		void								SetIndex(size_t Index);
-		size_t								GetIndex() const;
+		uint64								GetIndex() const;
 
 		void								SetMessageCode(ACEMIMessageCode code);
 		ACEMIMessageCode					GetMessageCode() const;
-
-		void								SetAdditionalInfo(const void* data, uint8 size);
-		const void*							GetAdditionalInfo() const;
-		uint8								GetAdditionalInfoSize() const;
 
 		virtual void						Generate(void* buffer, uint8& size) const;
 		virtual size_t						Process(const void* buffer, size_t size);
@@ -111,7 +109,28 @@ class ACEMIMessage
 		virtual								~ACEMIMessage();
 };
 
-class ACEMIMessageData : public ACEMIMessage
+class ACEMIMessageGeneric : public ACEMIMessage
+{
+
+	private:
+		uint8								additionalInfo[256];
+		uint8								additionalInfoSize;
+
+	public:
+		void								SetAdditionalInfo(const void* data, uint8 size);
+		const void*							GetAdditionalInfo() const;
+		uint8								GetAdditionalInfoSize() const;
+
+		virtual void						Generate(void* buffer, uint8& size) const;
+		virtual size_t						Process(const void* buffer, size_t size);
+
+		virtual std::string					ToString() const;
+
+											ACEMIMessageGeneric();
+		virtual								~ACEMIMessageGeneric();
+};
+
+class ACEMIMessageData : public ACEMIMessageGeneric
 {
 	private:
 		ACEMIFrameFormat					frameFormat;
@@ -231,4 +250,50 @@ class ACEMIMessageData : public ACEMIMessage
 		virtual std::string					ToString() const;
 
 											ACEMIMessageData();
+};
+
+class ACEMIMessageProperty : public ACEMIMessage
+{
+	private:
+		uint16								interfaceObjectType;
+		uint8								objectInstance;
+		uint8								propertyId;
+		uint8								arraySize;
+		uint16								arrayStartIndex;
+		uint8								array[2046];
+		uint8								arrayElementSize;
+		bool								requestArraySize;
+		uint8								errorCode;
+
+	public:
+		void								SetInterfaceObjectType(uint16 type);
+		uint16								GetInterfaceObjectType() const;
+
+		void								SetObjectInstance(uint8 instance);
+		uint8								GetObjectInstance() const;
+
+		void								SetPropertyId(uint8 id);
+		uint8								GetPropertyId() const;
+
+		void								SetArraySize(uint16 index);
+		uint8								GetArraySize() const;
+
+		void								SetArrayStartIndex(uint16 index);
+		uint16								GetArrayStartIndex() const;
+
+		void								SetArrayElementSize(uint8 size);
+		uint8								GetArrayElementSize() const;
+
+		void								SetArrayElement(uint8 offset, void* element);
+		const void*							GetArrayElement(uint8 offset) const;
+
+		void								SetRequestArraySize(bool request);
+		bool								GetRequestArraySize() const;
+
+		virtual void						Generate(void* buffer, uint8& size) const;
+		virtual size_t						Process(const void* buffer, size_t size);
+
+		virtual std::string					ToString() const;
+
+											ACEMIMessageProperty();
 };

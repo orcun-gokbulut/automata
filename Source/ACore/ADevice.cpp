@@ -80,7 +80,7 @@ bool ADevice::Deinitialize()
 
 void ADevice::TelegramReceived(const ACEMIMessage& message)
 {
-	if (message.GetMessageCode() == ACEMIMessageCode::Data_Received)
+	if (message.GetMessageCode() == ACEMIMessageCode::DataReceived)
 		return;
 
 	const ACEMIMessageData& dataMessage = static_cast<const ACEMIMessageData&>(message);
@@ -91,7 +91,7 @@ void ADevice::TelegramReceived(const ACEMIMessage& message)
 		for (auto iterator = dataPoints.begin(); iterator != dataPoints.end(); iterator++)
 		{
 			ADataPoint* current = *iterator;
-			if (current->GetAddress() == dataMessage.GetDestinationGroup())
+			if (current->GetAddress().GetRaw() != 0x0000 && current->GetAddress() == dataMessage.GetDestinationGroup())
 				current->Process(dataMessage);
 		}
 	}

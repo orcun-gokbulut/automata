@@ -605,8 +605,9 @@ void ADataPoint::SendUpdate()
 		return;
 
 	ACEMIMessageData message;
-	message.SetMessageCode(ACEMIMessageCode::Data_Transmit);
+	message.SetMessageCode(ACEMIMessageCode::DataTransmitRequest);
 	Generate(message);
+
 	core->SendMessage(message);
 }
 

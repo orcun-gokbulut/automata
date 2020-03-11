@@ -7,7 +7,7 @@
 
 #include <sstream>
 
-void AHIDReport::SetIndex(uint64 index)
+void AHIDReport::SetIndex(uint64 index) const
 {
 	this->index = index;
 }

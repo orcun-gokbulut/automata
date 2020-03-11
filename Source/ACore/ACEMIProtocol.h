@@ -12,6 +12,10 @@
 struct ACEMIHeader
 {
 	uint8 messageCode;
+};
+
+struct ACEMIPacketHeaderGeneric
+{
 	uint8 additionalInfoSize;
 };
 
@@ -32,7 +36,7 @@ struct ACEMIDataPacketControl
 	uint8					destinationAddresType : 1;
 };
 
-struct ACEMIDataPacket
+struct ACEMIPacketData
 {
 	ACEMIDataPacketControl	control;
 	uint16					source;
@@ -40,6 +44,16 @@ struct ACEMIDataPacket
 	uint8					length;
 	uint8					tapci0;
 	uint8					tapci1;
+};
+
+struct ACEMIPacketProperty
+{
+	uint16					interfaceObjectType;
+	uint8					objectInstance;
+	uint8					propertyId;
+	uint8					arraySize : 4;
+	uint8					arrayIndexH : 4;
+	uint8					arrayIndexL;
 };
 
 #pragma pack(pop)

@@ -36,19 +36,25 @@ int main(int argc, const char** argv)
 	salonOturmaAvize->SetDimLevelStatusAddress(AGroupAddress(5, 1, 9));
 	core.AddDevice(salonOturmaAvize);
 
+	ADeviceSwitch* calismaOdasiAvize = new ADeviceSwitch();
+	calismaOdasiAvize->SetName("Calısma-Odasi-Avize");
+	calismaOdasiAvize->SetOnOffAddress(AGroupAddress(6, 0, 0));
+	calismaOdasiAvize->SetOnOffStatusAddress(AGroupAddress(6, 0, 1));
+	core.AddDevice(calismaOdasiAvize);
+
 	core.SetPreLoopCallback(
-		[salonOturmaAvize](ACore* core)
+		[calismaOdasiAvize](ACore* core)
 		{
 			static auto future = std::async(std::launch::async, GetLineFromCin);
 			if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) 
 			{
 				auto line = future.get();
 				future = std::async(std::launch::async, GetLineFromCin);
-				if (line == "send")
-				{
-					salonOturmaAvize->SetDim(0.5);
-					salonOturmaAvize->SetOnOff(true);
-				}
+				if (line == "off")
+					calismaOdasiAvize->SetOnOff(false);
+				else if (line == "on")
+					calismaOdasiAvize->SetOnOff(true);
+
 				std::cout << "you wrote " << line << std::endl;
 			}
 
