@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
-add_subdirectory(hidapi)
-
-
-add_library(libhalf INTERFACE)
-target_sources(libhalf INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/half.hpp)
-target_include_directories(libhalf INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-
-get_property(Sources TARGET libhalf PROPERTY INTERFACE_SOURCES)
-source_group("" FILES ${Sources})
+add_subdirectory(libemail)
+add_subdirectory(libhalf)
+add_subdirectory(libhidapi)
+add_subdirectory(libhttp)
+add_subdirectory(libjson)
