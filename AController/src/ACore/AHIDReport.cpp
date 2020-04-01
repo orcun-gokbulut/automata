@@ -6,6 +6,7 @@
 #include "ACommon/AError.h"
 
 #include <sstream>
+#include <memory.h>
 
 void AHIDReport::SetIndex(uint64 index) const
 {
@@ -95,7 +96,7 @@ void AHIDReport::SetData(const void* data, uint8 size)
 	if (size != 0)
 		SetDataSize(size);
 
-	memcpy_s(this->data, sizeof(this->data), data, GetDataSize());
+	memcpy(this->data, data, GetDataSize());
 }
 
 void AHIDReport::AddData(const void* data, uint8 size)

@@ -9,7 +9,8 @@
 
 #include <iostream>
 #include <hidapi.h>
-
+#include <string.h>
+#include <memory.h>
 
 using namespace std;
 

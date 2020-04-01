@@ -335,7 +335,7 @@ void ADataPoint::SetString(const char* value)
 	CheckError(value == nullptr, RETURN_VOID, "Setting OHDataPoint value is failed. String is NULL.");
 	CheckError(strlen(value) > 14, RETURN_VOID, "Setting OHDataPoint value is failed. String value length is too big. Length: %d.", strlen(value));
 
-	strcpy_s(this->value.string_, 15, value);
+	strcpy(this->value.string_, value);
 
 	if (!insideUpdateEvent)
 	{

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 
 add_library(ACore STATIC "")
 
@@ -21,7 +21,6 @@ target_sources(ACore PUBLIC  ADevice.h)
 target_sources(ACore PRIVATE ADevice.cpp)
 target_sources(ACore PUBLIC  ADeviceSwitch.h)
 target_sources(ACore PRIVATE ADeviceSwitch.cpp)
-
 
 target_link_libraries(ACore libhidapi libhalf)
 

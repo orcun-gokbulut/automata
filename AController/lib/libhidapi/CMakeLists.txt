@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.16)
 
 add_library(libhidapi STATIC "")
 
@@ -14,7 +14,8 @@ elseif(APPLE)
 	target_sources(libhidapi PRIVATE hid_macosx.c)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	target_sources(libhidapi PRIVATE hid_linux.c)
-endif()
+	set_property(TARGET libhidapi PROPERTY INTERFACE_LINK_LIBRARIES udev pthread)
+	endif()
 
 get_property(Sources TARGET libhidapi PROPERTY SOURCES)
 source_group("" FILES ${Sources})
