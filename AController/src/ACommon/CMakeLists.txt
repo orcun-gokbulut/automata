@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 include (TestBigEndian)
 
@@ -9,11 +9,11 @@ if (IS_BIG_ENDIAN)
 	target_compile_definitions(ACommon PUBLIC _BIG_ENDIAN)
 endif()
 
-target_sources(ACommon PUBLIC  ATypes.h)
+target_sources(ACommon PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/ATypes.h)
 target_sources(ACommon PRIVATE ATypes.cpp)
-target_sources(ACommon PUBLIC  AEndian.h)
+target_sources(ACommon PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/AEndian.h)
 target_sources(ACommon PRIVATE AEndian.cpp)
-target_sources(ACommon PUBLIC  AError.h)
+target_sources(ACommon PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/AError.h)
 target_sources(ACommon PRIVATE AError.cpp)
 
 get_property(Sources TARGET ACommon PROPERTY SOURCES)

@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 add_library(libhidapi STATIC "")
 
-target_sources(libhidapi PUBLIC hidapi.h)
+target_sources(libhidapi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/hidapi.h)
 
 set_property(TARGET libhidapi PROPERTY FOLDER "Library")
 set_property(TARGET libhidapi PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})

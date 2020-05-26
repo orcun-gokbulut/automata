@@ -1,7 +1,6 @@
 #include "ADeviceRelay.h"
 
 #include <httplib.h>
-#include <uriparser/Uri.h>
 
 class url 
 {
