@@ -21,8 +21,10 @@ target_sources(ACore PUBLIC  ADevice.h)
 target_sources(ACore PRIVATE ADevice.cpp)
 target_sources(ACore PUBLIC  ADeviceSwitch.h)
 target_sources(ACore PRIVATE ADeviceSwitch.cpp)
+target_sources(ACore PUBLIC  ADeviceRelay.h)
+target_sources(ACore PRIVATE ADeviceRelay.cpp)
 
-target_link_libraries(ACore libhidapi libhalf)
+target_link_libraries(ACore libhidapi libhalf libhttp liburiparser)
 
 get_property(Sources TARGET ACore PROPERTY SOURCES)
 source_group("" FILES ${Sources})

@@ -3,16 +3,16 @@
 #include "ADevice.h"
 
 class ACEMIMessageData;
-void ADeviceRemoteRelay: public ADevice
+class ADeviceRelay : public ADevice
 {
 	private:
 		ADataPoint							onOffControl;
-		ADataPoint							onOffstatus;
+		ADataPoint							onOffStatus;
 
-        string                              onURL;
-        string                              offURL;
+        std::string                         onURL;
+        std::string                         offURL;
 
-		void								OnOnOffUpdated(const ACEMIMessageData& message);
+		void								OnOnOffControlUpdated(const ACEMIMessageData& message);
 
 	public:
 		void								SetOnOffAddress(const AGroupAddress& address);
@@ -21,15 +21,12 @@ void ADeviceRemoteRelay: public ADevice
         void								SetOnOffStatusAddress(const AGroupAddress& address);
 		const AGroupAddress&				GetOnOffStatusAddress() const;
 
-        void                                SetOnURL(const string URL);
-        const string&                       GetOnURL() const;
+        void                                SetOnURL(const std::string& URL);
+        const std::string&                  GetOnURL() const;
 
-        void                                SetOffURL(const string URL);
-        const string&                       GetOffURL() const;
+        void                                SetOffURL(const std::string& URL);
+        const std::string&                  GetOffURL() const;
 
-		void								SetOnOffStatusAddress(const AGroupAddress& address);
-		const AGroupAddress&				GetOnOffStatusAddress() const;
-
-        									ADeviceSwitch();
-		virtual								~ADeviceSwitch();
+        									ADeviceRelay();
+		virtual								~ADeviceRelay();
 };

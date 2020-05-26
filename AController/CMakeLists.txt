@@ -10,7 +10,7 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/Source)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Run")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/run")
 
-add_subdirectory(Library)
-add_subdirectory(Source)
+add_subdirectory(lib)
+add_subdirectory(src)

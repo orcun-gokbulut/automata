@@ -1,5 +1,6 @@
 ﻿#include "ACore/ACore.h"
 #include "ACore/ADeviceSwitch.h"
+#include "ACore/ADeviceRelay.h"
 
 #include <string.h>
 #include <future>
@@ -17,10 +18,18 @@ int main(int argc, const char** argv)
 {
 	ACore core;
 	core.SetAddress(AIndividualAddress(2, 1, 1));
-	core.SetPrintHIDPackets(true);
+	core.SetPrintHIDPackets(false);
 	core.SetPrintMessages(true);
 
-	ADeviceSwitch* salonYemekAvize = new ADeviceSwitch();
+	ADeviceRelay* relay = new ADeviceRelay();
+	relay->SetOnURL("http://192.168.44.51/on");
+	relay->SetOffURL("http://192.168.44.51/off");
+	relay->SetName("Çalışma Odası-Abajur");
+	relay->SetOnOffAddress(AGroupAddress(6,0,4));
+	relay->SetOnOffStatusAddress(AGroupAddress(6,0,5));
+	core.AddDevice(relay);
+
+	/*ADeviceSwitch* salonYemekAvize = new ADeviceSwitch();
 	salonYemekAvize->SetName("Salon-YemekAlani-Avize");
 	salonYemekAvize->SetOnOffAddress(AGroupAddress(5, 1, 0));
 	salonYemekAvize->SetOnOffStatusAddress(AGroupAddress(5, 1, 1));
@@ -59,7 +68,7 @@ int main(int argc, const char** argv)
 			}
 
 		}
-	);
+	);*/
 
 	core.Initialize();
 	core.Execute();

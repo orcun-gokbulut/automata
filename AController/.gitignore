@@ -1,3 +1,6 @@
 /build/*
 /run/*
 /.vs
+/lib/libemail
+/lib/libopenssl
+/lib/libcurl

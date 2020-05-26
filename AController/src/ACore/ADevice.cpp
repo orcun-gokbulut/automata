@@ -80,7 +80,7 @@ bool ADevice::Deinitialize()
 
 void ADevice::TelegramReceived(const ACEMIMessage& message)
 {
-	if (message.GetMessageCode() == ACEMIMessageCode::DataReceived)
+	if (message.GetMessageCode() != ACEMIMessageCode::DataReceived)
 		return;
 
 	const ACEMIMessageData& dataMessage = static_cast<const ACEMIMessageData&>(message);
