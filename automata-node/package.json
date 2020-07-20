@@ -1,0 +1,13 @@
+{
+	"name": "automata-node",
+	"version": "1.0.0",
+	"description": "Automata module for node.js",
+	"scripts": {
+		"install": "cmake-js compile"
+	},
+	"dependencies": {
+		"bindings": "^1.5.0",
+		"cmake-js": "^6.1.0",
+		"nan": "^2.14.1"
+	}
+}
