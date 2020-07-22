@@ -6,10 +6,10 @@ list(APPEND UIs      ARelayConfiguratorDialog.ui)
 list(APPEND Sources ARelayConfigurator.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_executable(ARelayConfigurator ${Headers} ${Sources} ${UIs})
-target_link_libraries(ARelayConfigurator Qt5::Widgets Qt5::Network)
+add_executable(automata-configurator ${Headers} ${Sources} ${UIs})
+target_link_libraries(automata-configurator Qt5::Widgets Qt5::Network)
 
-get_property(Sources TARGET ARelayConfigurator PROPERTY SOURCES)
+get_property(Sources TARGET automata-configurator PROPERTY SOURCES)
 source_group("" FILES ${Sources} ${Headers} ${UIs})
 
 #install(TARGETS ADevices LIBRARY DESTINATION lib)

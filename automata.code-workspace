@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": "automata-app"
+		},
+		{
+			"path": "automata-configurator"
+		},
+		{
+			"path": "automata-lib"
+		},
+		{
+			"path": "automata-node"
+		},
+		{
+			"path": "automata-relay"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"qmainwindow": "cpp"
+		}
+	}
+}
