@@ -19,3 +19,5 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
 get_property(Sources TARGET libhidapi PROPERTY SOURCES)
 source_group("" FILES ${Sources})
+
+install(TARGETS libhidapi ARCHIVE DESTINATION lib)

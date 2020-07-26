@@ -12,6 +12,6 @@ target_link_libraries(ADevices libhttp)
 get_property(Sources TARGET ADevices PROPERTY SOURCES)
 source_group("" FILES ${Sources})
 
-install(TARGETS ADevices LIBRARY DESTINATION lib)
+install(TARGETS ADevices ARCHIVE DESTINATION lib)
 get_target_property(HEADERS ACore INTERFACE_SOURCES)
 install(FILES ${Headers} DESTINATION include/ADevices)

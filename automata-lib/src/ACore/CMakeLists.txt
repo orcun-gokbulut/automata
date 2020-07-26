@@ -21,7 +21,6 @@ add_library(ACore STATIC ${Headers} ${Sources})
 target_link_libraries(ACore libhidapi)
 source_group("" FILES ${Headers} ${Sources})
 
-install(TARGETS libhidapi DESTINATION lib)
-install(TARGETS ACore LIBRARY DESTINATION lib)
+install(TARGETS ACore ARCHIVE DESTINATION lib)
 get_target_property(HEADERS ACore INTERFACE_SOURCES)
 install(FILES ${Headers} DESTINATION include/ACore)

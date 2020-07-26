@@ -3,7 +3,7 @@ Description=Orcun's home automation service.
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/automata
+ExecStart=/usr/local/bin/automata-app
 
 [Install]
 WantedBy=multi-user.target

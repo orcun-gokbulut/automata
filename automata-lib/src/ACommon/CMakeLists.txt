@@ -19,6 +19,6 @@ add_library(ACommon STATIC ${Headers} ${Sources})
 target_link_libraries(ACommon libhalf)
 source_group("" FILES ${Headers} ${Sources})
 
-install(TARGETS ACommon LIBRARY DESTINATION lib)
+install(TARGETS ACommon ARCHIVE DESTINATION lib)
 get_target_property(HEADERS ACore INTERFACE_SOURCES)
 install(FILES ${Headers} DESTINATION include/ACommon)

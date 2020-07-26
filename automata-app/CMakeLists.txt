@@ -14,3 +14,5 @@ endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/run")
 
 add_subdirectory(src)
+
+install(FILES tools/automata.service DESTINATION /lib/systemd/system)
