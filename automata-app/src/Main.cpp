@@ -21,13 +21,29 @@ int main(int argc, const char** argv)
 	core.SetPrintHIDPackets(false);
 	core.SetPrintMessages(true);
 
-	ADeviceRelay* relay = new ADeviceRelay();
-	relay->SetOnURL("http://192.168.44.51/on");
-	relay->SetOffURL("http://192.168.44.51/off");
-	relay->SetName("Çalışma Odası-Abajur");
-	relay->SetOnOffAddress(AGroupAddress(6,0,4));
-	relay->SetOnOffStatusAddress(AGroupAddress(6,0,5));
-	core.AddDevice(relay);
+	ADeviceRelay* relay00 = new ADeviceRelay();
+	relay00->SetOnURL("http://192.168.44.51/on");
+	relay00->SetOffURL("http://192.168.44.51/off");
+	relay00->SetName("CalismaOdasi-Abajur-00");
+	relay00->SetOnOffAddress(AGroupAddress(6,0,4));
+	relay00->SetOnOffStatusAddress(AGroupAddress(6,0,5));
+	core.AddDevice(relay00);
+
+    ADeviceRelay* relay01 = new ADeviceRelay();
+	relay01->SetOnURL("http://192.168.44.52/on");
+	relay01->SetOffURL("http://192.168.44.52/off");
+	relay01->SetName("CalismaOdasi-Abajur-01");
+	relay01->SetOnOffAddress(AGroupAddress(6,0,6));
+	relay01->SetOnOffStatusAddress(AGroupAddress(6,0,7));
+	core.AddDevice(relay01);
+
+    ADeviceRelay* relay02 = new ADeviceRelay();
+	relay02->SetOnURL("http://192.168.44.53/on");
+	relay02->SetOffURL("http://192.168.44.53/off");
+	relay02->SetName("Salon-OturmaAlani-Abajur-00");
+	relay02->SetOnOffAddress(AGroupAddress(5,0,8));
+	relay02->SetOnOffStatusAddress(AGroupAddress(5,0,9));
+	core.AddDevice(relay02);
 
 	/*ADeviceSwitch* salonYemekAvize = new ADeviceSwitch();
 	salonYemekAvize->SetName("Salon-YemekAlani-Avize");

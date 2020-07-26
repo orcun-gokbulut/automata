@@ -16,37 +16,25 @@
 #define GPIO_RELAY 12
 #define GPIO_LED 13
 #define GPIO_BUTTON 0
-#define GPIO_BUTTON_PRESSED LOW
-const uint32_t EEPROMVerificationMagicWord = 0x9e5bd6d8;
+#define GPIO_BUTTON_PRESSING LOW
 
+const uint32_t configurationHeader = 0x5fe08e26;
 struct Configuration
 {
-    bool configured;
+    uint32_t header;
     uint32_t UUID;
+    char wifiSSID[64];
+    char wifiPassword[64];
     char hostname[32];
-    bool powerOnState;
     bool DHCP;
     uint32_t IP;
     uint32_t subnet;
     uint32_t gateway;
     uint16_t httpPort;
+    bool powerOnState;
 };
 
-struct WifiConfiguration
-{
-    bool configured;
-    char SSID[64];
-    char password[64];
-};
-
-const uint32_t ConfigurationBroadcastPacketHeader = 0xb713e302;
-struct ConfigurationBroadcastPacket
-{
-    uint32_t header;
-    Configuration configuration;
-};
-
-const uint32_t ConfigurationBroadcastReplyPacketHeader = 0x53f59729;
+const uint32_t configurationReplyHeader =  0x53f59729;
 struct ConfigurationBroadcastReplyPacket
 {
     uint32_t header;
@@ -63,16 +51,13 @@ enum class State
 };
 
 // Configuration
-WifiConfiguration wifiConfiguration;
 Configuration configuration;
 State state = State::WifiConnection;
 const long clientTimeout = 2000;
 bool verbose = true;
 bool debug = true;
-
 WiFiServer* server = NULL;
 WiFiUDP udp;
-
 bool relayState = false;
 
 void verboseOut(const char* format, ...)
@@ -114,29 +99,29 @@ void blink(int count, int ms)
 
 bool buttonReleased()
 {
-    unsigned long lastStateChange = 0;
-    bool currentState = digitalRead(GPIO_BUTTON) == GPIO_BUTTON_PRESSED;
-    digitalWrite(GPIO_LED, currentState);
+    static unsigned long lastStateChange = 0;
+    bool currentState = digitalRead(GPIO_BUTTON) == GPIO_BUTTON_PRESSING;
 
-    if (currentState && lastStateChange == 0)
+    if (currentState)
     {
-        if (currentState)
-        lastStateChange = millis();
+        if (lastStateChange == 0)
+            lastStateChange = millis();
 
         return false;
     }
-    else if (!currentState)
+    else
     {
-        verboseOut("eee.");
-        if (millis() - lastStateChange > 50)
+        if (lastStateChange == 0)
         {
-            verboseOut("Pressed.");
+            return false;
+        }
+        else if (millis() - lastStateChange > 50)
+        {
             lastStateChange = 0;
             return true;
         }
         else
         {
-            verboseOut("Pressed.");
             lastStateChange = 0;
             return false;
         }
@@ -145,7 +130,7 @@ bool buttonReleased()
 
 const char* getStateName(State state)
 {
-    switch(state)
+    switch (state)
     {
         case State::WifiConnection:
         return "WifiConnection";
@@ -194,98 +179,85 @@ void setupHardware()
     WiFi.setAutoConnect(false);
 
     Serial.begin(115200);
+    delay(5000);
     Serial.print("\n\n");
-}
-
-void setupEEPROM()
-{
-    verboseOut("Checking EEPROM...");
-    uint32_t magicWord;
-    EEPROM.get(0, magicWord);
-
-    if (magicWord == EEPROMVerificationMagicWord)
-        return;
-
-    verboseOut("Uninitialized EEPROM detected. Initializing...");
-
-    memset(&wifiConfiguration, 0, sizeof(WifiConfiguration));
-    memset(&configuration, 0, sizeof(Configuration));
-
-    writeEEPROM();
 }
 
 void readEEPROM()
 {
     verboseOut("Reading configurations from EEPROM...");
-    EEPROM.begin(sizeof(uint32_t) + sizeof(WifiConfiguration) + sizeof(WifiConfiguration));
-        setupEEPROM();
-        EEPROM.get(sizeof(uint32_t), wifiConfiguration);
-        EEPROM.get(sizeof(uint32_t) + sizeof(WifiConfiguration), wifiConfiguration);
+    EEPROM.begin(sizeof(Configuration));
+        EEPROM.get(0, configuration);
     EEPROM.end();
+
+    if (configuration.header != configurationHeader)
+    {
+        verboseOut("Uninitialized EEPROM detected. Initializing...");
+        memset(&configuration, 0, sizeof(Configuration));
+        configuration.header = configurationHeader;
+        configuration.UUID = random(0, 999999999);
+        sprintf(configuration.hostname, "Relay-%u", configuration.UUID);
+        configuration.DHCP = true;
+
+        configuration.httpPort = 80;
+        writeEEPROM();
+    }
+    else
+    {
+        verboseOut("UUID: 0x%08X", configuration.UUID);
+        verboseOut("Wifi SSID: %s", configuration.wifiSSID);
+        verboseOut("Wifi Password: %s", configuration.wifiPassword);
+        verboseOut("Hostname: %s", configuration.hostname);
+        verboseOut("DHCP: %s", configuration.DHCP ? "yes" : "no");
+        verboseOut("IP: %u.%u.%u.%u",
+            ((char*)&configuration.IP)[0],
+            ((char*)&configuration.IP)[1],
+            ((char*)&configuration.IP)[2],
+            ((char*)&configuration.IP)[3]);
+        verboseOut("Subnet: %u.%u.%u.%u",
+            ((char*)&configuration.subnet)[0],
+            ((char*)&configuration.subnet)[1],
+            ((char*)&configuration.subnet)[2],
+            ((char*)&configuration.subnet)[3]);
+        verboseOut("Gateway: %u.%u.%u.%u",
+            ((char*)&configuration.gateway)[0],
+            ((char*)&configuration.gateway)[1],
+            ((char*)&configuration.gateway)[2],
+            ((char*)&configuration.gateway)[3]);
+        verboseOut("HTTP Port: %u", configuration.httpPort);
+        verboseOut("Power On State: %s", configuration.powerOnState ? "Yes" : "No");
+    }
 }
 
 void writeEEPROM()
 {
     verboseOut("Writing configurations to EEPROM...");
-    EEPROM.begin(sizeof(uint32_t) + sizeof(WifiConfiguration) + sizeof(WifiConfiguration));
-        EEPROM.put(0, EEPROMVerificationMagicWord);
-        EEPROM.put(sizeof(uint32_t), wifiConfiguration);
-        EEPROM.put(sizeof(uint32_t) + sizeof(WifiConfiguration), wifiConfiguration);
+    verboseOut("UUID: 0x%08X", configuration.UUID);
+    verboseOut("Wifi SSID: %s", configuration.wifiSSID);
+    verboseOut("Wifi Password: %s", configuration.wifiPassword);
+    verboseOut("Hostname: %s", configuration.hostname);
+    verboseOut("DHCP: %s", configuration.DHCP ? "yes" : "no");
+    verboseOut("IP: %u.%u.%u.%u",
+        ((char*)&configuration.IP)[0],
+        ((char*)&configuration.IP)[1],
+        ((char*)&configuration.IP)[2],
+        ((char*)&configuration.IP)[3]);
+    verboseOut("Subnet: %u.%u.%u.%u",
+        ((char*)&configuration.subnet)[0],
+        ((char*)&configuration.subnet)[1],
+        ((char*)&configuration.subnet)[2],
+        ((char*)&configuration.subnet)[3]);
+    verboseOut("Gateway: %u.%u.%u.%u",
+        ((char*)&configuration.gateway)[0],
+        ((char*)&configuration.gateway)[1],
+        ((char*)&configuration.gateway)[2],
+        ((char*)&configuration.gateway)[3]);
+    verboseOut("HTTP Port: %u", configuration.httpPort);
+    verboseOut("Power On State: %s", configuration.powerOnState ? "Yes" : "No");
+
+    EEPROM.begin(sizeof(Configuration));
+        EEPROM.put(0, configuration);
     EEPROM.end();
-}
-
-void wifiConnectionState()
-{
-    if (!wifiConfiguration.configured)
-    {
-        changeState(State::WPSConfiguration);
-        return;
-    }
-
-    verboseOut("Setting up network...");
-    WiFi.disconnect();
-
-    if (configuration.configured)
-    {
-        WiFi.hostname(configuration.hostname);
-        if (!configuration.DHCP)
-        {
-        WiFi.config(
-            IPAddress(configuration.IP),
-            IPAddress(configuration.gateway),
-            IPAddress(configuration.subnet));
-        }
-    }
-    else
-    {
-        WiFi.hostname("ARelay");
-    }
-
-    WiFi.begin(wifiConfiguration.SSID, wifiConfiguration.password);
-
-    verboseOut("Connecting to access point...");
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        blink(1, 500);
-        if (buttonReleased())
-        {
-        verboseOut("User rejected wifi configuration by pressing button. Reseting Wifi configuration.");
-        wifiConfiguration.configured = false;
-        changeState(State::WPSConfiguration);
-        WiFi.disconnect();
-        return;
-        }
-    }
-
-    verboseOut("Connected to access point.");
-    verboseOut("SSID: %s", WiFi.SSID().c_str());
-    verboseOut("IP: %s", WiFi.localIP().toString().c_str());
-    verboseOut("Subnet: %s", WiFi.subnetMask().toString().c_str());
-    verboseOut("Gateway: %s", WiFi.gatewayIP().toString().c_str());
-    verboseOut("DNS#1: %s", WiFi.dnsIP().toString().c_str());
-    verboseOut("DNS#2: %s", WiFi.dnsIP(1).toString().c_str());
-
-    changeState(State::Running);
 }
 
 void WPSConfigurationState()
@@ -294,24 +266,18 @@ void WPSConfigurationState()
 
     verboseOut("WPS config waiting for user input...");
 
-    while(true)
+    while (true)
     {
         blink(1, 100);
 
         if (buttonReleased())
-        {
-        verboseOut("Starting searching WPS configuration by pressing button...");
-        return;
-        }
+            break;
     }
 
+    verboseOut("Starting searching WPS configuration by pressing button...");
     digitalWrite(GPIO_LED, HIGH);
 
-    if (configuration.configured)
-        WiFi.hostname(configuration.hostname);
-    else
-        WiFi.hostname("ARelay");
-
+    WiFi.hostname(configuration.hostname);
     bool result = WiFi.beginWPSConfig();
     if (!result)
     {
@@ -328,65 +294,130 @@ void WPSConfigurationState()
         return;
     }
 
-    wifiConfiguration.configured = true;
-    strncpy(wifiConfiguration.SSID, newSSID.c_str(), 64);
-    strncpy(wifiConfiguration.password, WiFi.psk().c_str(), 64);
+    strncpy(configuration.wifiSSID, newSSID.c_str(), 64);
+    strncpy(configuration.wifiPassword, WiFi.psk().c_str(), 64);
+    configuration.DHCP = true;
     writeEEPROM();
 
     verboseOut("WPS finished. Connected to access point.");
     verboseOut("SSID: %s", WiFi.SSID().c_str());
+    verboseOut("Passwrod: %s", WiFi.psk().c_str());
 
     digitalWrite(GPIO_LED, LOW);
 
     changeState(State::WifiConnection);
 }
 
+void wifiConnectionState()
+{
+    if (configuration.wifiSSID[0] == '\0')
+    {
+        changeState(State::WPSConfiguration);
+        return;
+    }
+
+    verboseOut("Setting up network...");
+    WiFi.disconnect();
+
+    if (configuration.hostname[0] != '\0')
+    {
+        WiFi.hostname(configuration.hostname);
+        if (!configuration.DHCP)
+        {
+            WiFi.config(
+                IPAddress(configuration.IP),
+                IPAddress(configuration.gateway),
+                IPAddress(configuration.subnet));
+        }
+    }
+    else
+    {
+        WiFi.hostname("ARelay");
+    }
+
+    verboseOut("Connecting to access point...");
+    WiFi.begin(configuration.wifiSSID, configuration.wifiPassword);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        blink(1, 500);
+        if (buttonReleased())
+        {
+            verboseOut("User rejected wifi configuration by pressing button. Reseting Wifi configuration.");
+            WiFi.disconnect();
+            changeState(State::WPSConfiguration);
+            return;
+        }
+
+        if (WiFi.status() == WL_CONNECT_FAILED)
+        {
+            verboseOut("Connection failed. Retrying.");
+            WiFi.disconnect();
+            WiFi.begin(configuration.wifiSSID, configuration.wifiPassword);
+        }
+    }
+
+    verboseOut("Connected to access point.");
+    verboseOut("SSID: %s", WiFi.SSID().c_str());
+    verboseOut("IP: %s", WiFi.localIP().toString().c_str());
+    verboseOut("Subnet: %s", WiFi.subnetMask().toString().c_str());
+    verboseOut("Gateway: %s", WiFi.gatewayIP().toString().c_str());
+    verboseOut("DNS#1: %s", WiFi.dnsIP().toString().c_str());
+    verboseOut("DNS#2: %s", WiFi.dnsIP(1).toString().c_str());
+
+    changeState(State::Setup);
+}
+
 void configurationState()
 {
     verboseOut("Listening network for configuration packet...");
 
-    ConfigurationBroadcastPacket packet;
+    Configuration packet;
 
-    digitalWrite(GPIO_LED, HIGH);
+    digitalWrite(GPIO_LED, LOW);
+
     udp.begin(1089);
     while (true)
     {
         if (buttonReleased())
         {
-        verboseOut("User exited configuration mode by pressing button.");
-        changeState(State::Running);
-        break;
+            verboseOut("User exited configuration mode by pressing button.");
+            changeState(State::Running);
+            break;
         }
 
         yield();
 
-        if (udp.read((char*)&packet, sizeof(ConfigurationBroadcastPacket)) != sizeof(ConfigurationBroadcastPacket))
-        continue;
+        if (udp.parsePacket() == 0)
+            continue;
 
-        if (packet.header != ConfigurationBroadcastPacketHeader)
-        continue;
+        if (udp.read((char*)&packet, sizeof(Configuration)) != sizeof(Configuration))
+            continue;
 
-        udp.stop();
+        if (packet.header != configurationHeader)
+            continue;
 
         verboseOut("New configuration packet received. Applying configuration...");
 
-        configuration = packet.configuration;
-        configuration.configured = true;
+        configuration = packet;
+        if (packet.wifiSSID[0] == '\0')
+        {
+            strcpy(configuration.wifiSSID, WiFi.SSID().c_str());
+            strcpy(configuration.wifiPassword, WiFi.psk().c_str());
+        }
         writeEEPROM();
 
         verboseOut("Sending acknowlegement to configuration sender...");
         udp.beginPacket(udp.remoteIP(), udp.remotePort());
-        ConfigurationBroadcastReplyPacket replayPacket;
-        replayPacket.header = ConfigurationBroadcastReplyPacketHeader;
-        udp.write((const char*)&replayPacket, sizeof(ConfigurationBroadcastReplyPacket));
+            ConfigurationBroadcastReplyPacket replayPacket;
+            replayPacket.header = configurationReplyHeader;
+            udp.write((const char*)&replayPacket, sizeof(ConfigurationBroadcastReplyPacket));
         udp.endPacket();
 
-        changeState(State::Setup);
+        udp.stop();
+
+        changeState(State::Teardown);
         break;
     }
-
-
-    digitalWrite(GPIO_LED, LOW);
 }
 
 void setupState()
@@ -414,7 +445,7 @@ void teardownState()
 
     WiFi.disconnect();
 
-    changeState(State::WPSConfiguration);
+    changeState(State::WifiConnection);
 }
 
 bool processRequest(WiFiClient* client, const String& requestHeader, String& responseHeader, String& responseBody)
@@ -533,6 +564,8 @@ void processClient(WiFiClient* client)
 
 void runningState()
 {
+    digitalWrite(GPIO_LED, HIGH);
+
     if (WiFi.status() == WL_DISCONNECTED)
     {
         changeState(State::Teardown);
@@ -559,18 +592,21 @@ void setup()
 
 void loop()
 {
-    if (!wifiConfiguration.configured)
+    if (state >= State::Setup)
     {
-        verboseOut("No Wifi configuration detected.");
-        changeState(State::WPSConfiguration);
-    }
-    else if (!configuration.configured)
-    {
-        verboseOut("No configuration detected.");
-        changeState(State::Configuration);
+        if (configuration.wifiSSID[0] == '\0')
+        {
+            verboseOut("No Wifi configuration detected.");
+            changeState(State::WPSConfiguration);
+        }
+        else if (WiFi.status() != WL_CONNECTED)
+        {
+            verboseOut("No Wifi connection detected.");
+            changeState(State::WifiConnection);
+        }
     }
 
-    switch(state)
+    switch (state)
     {
         case State::WifiConnection:
             wifiConnectionState();

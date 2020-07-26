@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/run/ARelayConfigurator",
+            "program": "${workspaceFolder}/run/automata-configurator",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

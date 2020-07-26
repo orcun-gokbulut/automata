@@ -33,10 +33,10 @@ struct ConfigurationBroadcastReplyPacket
 QString ToStringIP(uint32_t ip)
 {
     return QString("%1.%2.%3.%4")
-        .arg(((quint8*)&ip)[3])
-        .arg(((quint8*)&ip)[2])
+        .arg(((quint8*)&ip)[0])
         .arg(((quint8*)&ip)[1])
-        .arg(((quint8*)&ip)[0]);
+        .arg(((quint8*)&ip)[2])
+        .arg(((quint8*)&ip)[3]);
 }
 
 void ARelayConfiguratorDialog::loadForm(Configuration* configuration)
@@ -70,9 +70,9 @@ void ARelayConfiguratorDialog::saveForm(Configuration* configuration)
     memcpy(configuration->wifiPassword, wifiPassowrd.data(), wifiPassowrd.size());
 
     configuration->DHCP = form->chkDHCP->isChecked();
-    configuration->IP = QHostAddress(form->txtIP->text()).toIPv4Address();
-    configuration->subnet = QHostAddress(form->txtSubnet->text()).toIPv4Address();
-    configuration->gateway = QHostAddress(form->txtGateway->text()).toIPv4Address();
+    configuration->IP = qToBigEndian(QHostAddress(form->txtIP->text()).toIPv4Address());
+    configuration->subnet = qToBigEndian(QHostAddress(form->txtSubnet->text()).toIPv4Address());
+    configuration->gateway = qToBigEndian(QHostAddress(form->txtGateway->text()).toIPv4Address());
 
     configuration->httpPort = form->spnHttpPort->value();
     configuration->powerOnState = form->chkPowerOn->isChecked();
@@ -87,10 +87,10 @@ void ARelayConfiguratorDialog::mnuNew_clicked()
     configuration.UUID = qrand() % 999999999;
     configuration.DHCP = true;
     configuration.httpPort = 80;
-    strcpy(configuration.hostname, "UnnamedRelay");
-    configuration.IP = QHostAddress("192.168.1.61").toIPv4Address();
-    configuration.subnet = QHostAddress("255.255.255.0").toIPv4Address();
-    configuration.gateway = QHostAddress("192.168.1.1").toIPv4Address();
+    sprintf(configuration.hostname, "Relay-%u", configuration.UUID);
+    configuration.IP = qToBigEndian(QHostAddress("192.168.1.61").toIPv4Address());
+    configuration.subnet = qToBigEndian(QHostAddress("255.255.255.0").toIPv4Address());
+    configuration.gateway = qToBigEndian(QHostAddress("192.168.1.1").toIPv4Address());
     loadForm(&configuration);
 }
 
@@ -217,7 +217,7 @@ void ARelayConfiguratorDialog::broadcast()
     form->lblBroadcast->setVisible(!form->lblBroadcast->isVisible());
 
     Configuration packet;
-    loadForm(&packet);
+    saveForm(&packet);
     socket.writeDatagram((const char*)&packet, sizeof(Configuration), QHostAddress::Broadcast, 1089);
 
     ConfigurationBroadcastReplyPacket replyPacket;
