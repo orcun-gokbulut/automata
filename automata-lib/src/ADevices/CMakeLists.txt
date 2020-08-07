@@ -7,7 +7,7 @@ list(APPEND Headers ADeviceRelay.h)
 list(APPEND Sources ADeviceRelay.cpp)
 
 add_library(ADevices STATIC ${Headers} ${Sources})
-target_link_libraries(ADevices libhttp)
+target_link_libraries(ADevices libhttp liburlparser)
 
 get_property(Sources TARGET ADevices PROPERTY SOURCES)
 source_group("" FILES ${Sources})
