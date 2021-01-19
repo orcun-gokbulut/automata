@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(automata-node)
-
-link_directories("../automata-lib/output/lib")
-include_directories("../automata-lib/output/include")
-
 set (SOURCE_FILES
     "src/ACore.cpp"
     "src/index.cpp"

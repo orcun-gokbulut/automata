@@ -175,7 +175,7 @@ void setupHardware()
 
     pinMode(GPIO_BUTTON, INPUT);
 
-    WiFi.mode(WIFI_STA);
+    WiFi.mode(WIFI_AP_STA);
     WiFi.setAutoConnect(false);
 
     Serial.begin(115200);

@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(automata-app C CXX)
-
 link_directories("../automata-lib/output/lib")
 include_directories("../automata-lib/output/include")
 
