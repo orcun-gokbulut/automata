@@ -41,7 +41,7 @@ void ADeviceRelay::OnOnOffControlUpdated(const ACEMIMessageData& message)
   
     httplib::Client client(urlTemp.host_, 80);
     std::shared_ptr<httplib::Response> response = client.Get(urlTemp.path_.c_str());
-    if (response->status == 200)
+    if (response != nullptr && response->status == 200)
         onOffStatus.SetBoolean(onOffControl.GetBoolean());
 }
 

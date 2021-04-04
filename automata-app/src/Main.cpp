@@ -19,7 +19,7 @@ int main(int argc, const char** argv)
 	ACore core;
 	core.SetAddress(AIndividualAddress(2, 1, 1));
 	core.SetPrintHIDPackets(false);
-	core.SetPrintMessages(true);
+	core.SetPrintMessages(false);
 
 	ADeviceRelay* relay00 = new ADeviceRelay();
 	relay00->SetOnURL("http://192.168.44.51/on");
