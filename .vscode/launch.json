@@ -8,10 +8,10 @@
             "name": "Launch Service",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/run/automata-service",
+            "program": "${workspaceFolder}/Run/automata-service",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/Run",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -21,19 +21,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "visualizerFile": "/home/orcun/.config/Code/User/workspaceStorage/b4cad81e76fe8b089256aa52cfb991b2/tonka3000.qtvsctools/qt.natvis.xml"
-        }
-    ],
-    "configurations": [
+            ]
+        },
         {
             "name": "Launch Configurator",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/output/automata-relay-configurator",
+            "program": "${workspaceFolder}/Run/automata-relay-configurator",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/run",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -43,8 +40,7 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ],
-            "visualizerFile": "/home/orcun/.config/Code/User/workspaceStorage/b4cad81e76fe8b089256aa52cfb991b2/tonka3000.qtvsctools/qt.natvis.xml"
+            ]
         }
     ]
 }

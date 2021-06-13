@@ -10,82 +10,82 @@
 
 void AHIDReport::SetIndex(uint64 index) const
 {
-	this->index = index;
+	this->m_index = index;
 }
 
 uint64 AHIDReport::GetIndex() const
 {
-	return index;
+	return m_index;
 }
 
 void AHIDReport::SetReportID(uint8 id)
 {
-	reportID = id;
+	m_reportID = id;
 }
 
 uint8 AHIDReport::GetReportID() const
 {
-	return reportID;
+	return m_reportID;
 }
 
 void AHIDReport::SetStartPacket(bool flag)
 {
-	startPacket = flag;
+	m_startPacket = flag;
 }
 
 bool AHIDReport::GetStartPacket() const
 {
-	return startPacket;
+	return m_startPacket;
 }
 
 void AHIDReport::SetEndPacket(bool flag)
 {
-	endPacket = flag;
+	m_endPacket = flag;
 }
 
 bool AHIDReport::GetEndPacket() const
 {
-	return endPacket;
+	return m_endPacket;
 }
 
 void AHIDReport::SetPartialPacket(bool flag)
 {
-	partialPacket = flag;
+	m_partialPacket = flag;
 }
 
 bool AHIDReport::GetPartialPacket() const
 {
-	return partialPacket;
+	return m_partialPacket;
 }
 
 void AHIDReport::SetSequenceNumber(uint8 number)
 {
-	sequenceNumber = number;
+	m_sequenceNumber = number;
 }
 
 uint8 AHIDReport::GetSequenceNumber() const
 {
-	return sequenceNumber;
+	return m_sequenceNumber;
 }
 
 void AHIDReport::SetProtocolVersion(uint8 version)
 {
-	protocolVersion = version;
+	m_protocolVersion = version;
 }
 
 uint8 AHIDReport::GetProtocolVersion() const
 {
-	return protocolVersion;
+	return m_protocolVersion;
 }
 
 void AHIDReport::SetDataSize(uint8 size)
 {
-	dataSize = size;
+	m_dataSize = size;
 }
 
 uint8 AHIDReport::GetDataSize() const
 {
-	return dataSize;
+	return m_dataSize;
 }
 
 void AHIDReport::SetData(const void* data, uint8 size)
@@ -96,7 +96,7 @@ void AHIDReport::SetData(const void* data, uint8 size)
 	if (size != 0)
 		SetDataSize(size);
 
-	memcpy(this->data, data, GetDataSize());
+	memcpy(this->m_data, data, GetDataSize());
 }
 
 void AHIDReport::AddData(const void* data, uint8 size)
@@ -104,43 +104,43 @@ void AHIDReport::AddData(const void* data, uint8 size)
 	if (data == nullptr || size == 0)
 		return;
 
-	memcpy(this->data + dataSize, data, size);
-	dataSize += size;
+	memcpy(this->m_data + m_dataSize, data, size);
+	m_dataSize += size;
 }
 
 const void* AHIDReport::GetData() const
 {
-	return data;
+	return m_data;
 }
 
 void AHIDReport::SetProtocolId(AHIDProtocolId id)
 {
-	protocolId = id;
+	m_protocolId = id;
 }
 
 AHIDProtocolId AHIDReport::GetProtocolId() const
 {
-	return protocolId;
+	return m_protocolId;
 }
 
 void AHIDReport::SetEMIId(uint8 id)
 {
-	EMIId = id;
+	m_EMIId = id;
 }
 
 uint8 AHIDReport::GetEMIId() const
 {
-	return EMIId;
+	return m_EMIId;
 }
 
 void AHIDReport::SetManufacturerCode(uint16 code)
 {
-	manufacturerCode = code;
+	m_manufacturerCode = code;
 }
 
 uint16 AHIDReport::GetManufacturerCode() const
 {
-	return manufacturerCode;
+	return m_manufacturerCode;
 }
 
 void AHIDReport::Generate(void* buffer, uint8& size) const
@@ -195,34 +195,34 @@ bool AHIDReport::Process(const void* buffer, uint8 size)
 
 void AHIDReport::Reset()
 {
-	index = 0;
-	reportID = 0x01;
-	startPacket = true;
-	endPacket = true;
-	partialPacket = false;
-	sequenceNumber = 0x01;
-	protocolVersion = 0x00;
-	protocolId = AHIDProtocolId::KNXTunnel;
-	EMIId = 0x03;
-	manufacturerCode = 0x0000;
-	dataSize = 0;
+	m_index = 0;
+	m_reportID = 0x01;
+	m_startPacket = true;
+	m_endPacket = true;
+	m_partialPacket = false;
+	m_sequenceNumber = 0x01;
+	m_protocolVersion = 0x00;
+	m_protocolId = AHIDProtocolId::KNXTunnel;
+	m_EMIId = 0x03;
+	m_manufacturerCode = 0x0000;
+	m_dataSize = 0;
 
-	memset(data, 0, sizeof(data));
+	memset(m_data, 0, sizeof(m_data));
 }
 
 std::string AHIDReport::ToString() const
 {
 	std::stringstream output;
-	output << "HID Packet #" << std::to_string((int)index) << "\n";
-	output << "  Report ID: " << std::to_string((int)reportID) << "\n";
-	output << "  Start Packet: " << (startPacket ? "True" : "False") << "\n";
-	output << "  End Packet: " << (endPacket ? "True" : "False") << "\n";
-	output << "  Partial Packet: " << (partialPacket ? "True" : "False") << "\n";
-	output << "  Sequence Number: " << std::to_string((int)sequenceNumber) << "\n";
-	output << "  Protocol Version: " << std::to_string(protocolVersion) << "\n";
+	output << "HID Packet #" << std::to_string((int)m_index) << "\n";
+	output << "  Report ID: " << std::to_string((int)m_reportID) << "\n";
+	output << "  Start Packet: " << (m_startPacket ? "True" : "False") << "\n";
+	output << "  End Packet: " << (m_endPacket ? "True" : "False") << "\n";
+	output << "  Partial Packet: " << (m_partialPacket ? "True" : "False") << "\n";
+	output << "  Sequence Number: " << std::to_string((int)m_sequenceNumber) << "\n";
+	output << "  Protocol Version: " << std::to_string(m_protocolVersion) << "\n";
 
 	output << "  Protocol Id: ";
-	switch (protocolId)
+	switch (m_protocolId)
 	{
 		case AHIDProtocolId::KNXTunnel:
 			output << "KNX Tunnel (0x01)";
@@ -231,12 +231,12 @@ std::string AHIDReport::ToString() const
 			output << "Bus Access (0x0F)";
 			break;
 		default:
-			output << "UNKNOWN (" << std::to_string((int)protocolId) << ")";
+			output << "UNKNOWN (" << std::to_string((int)m_protocolId) << ")";
 	}
 	output << "\n";
 
 	output << "  EMI ID: ";
-	switch (EMIId)
+	switch (m_EMIId)
 	{
 		case 0x01:
 			output << "EMI1 (0x01)";
@@ -248,19 +248,19 @@ std::string AHIDReport::ToString() const
 			output << "cEMI (0x03)";
 			break;
 		default:
-			output << "UNKNOWN (" << std::to_string((int)EMIId) << ")";
+			output << "UNKNOWN (" << std::to_string((int)m_EMIId) << ")";
 			break;
 	}
 	output << "\n";
 
-	output << "  Manufacturer Code: " << std::to_string((int)manufacturerCode) << "\n";
-	output << "  Data Size: " << (int)dataSize << "\n";
+	output << "  Manufacturer Code: " << std::to_string((int)m_manufacturerCode) << "\n";
+	output << "  Data Size: " << (int)m_dataSize << "\n";
 
 	output << "  Data: ";
-	for (uint8 i = 0; i < dataSize; i++)
+	for (uint8 i = 0; i < m_dataSize; i++)
 	{
 		char hexOutput[3];
-		toHex(data[i], hexOutput);
+		toHex(m_data[i], hexOutput);
 		output << hexOutput << " ";
 	}
 	output << "\n";

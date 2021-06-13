@@ -14,18 +14,18 @@ class AHIDReport
 {
 	friend class ACore;
 	private:
-		mutable uint64				index;
-		uint8						reportID;
-		bool						startPacket;
-		bool						endPacket;
-		bool						partialPacket;
-		uint8						sequenceNumber;
-		uint8						protocolVersion;
-		AHIDProtocolId				protocolId;
-		uint8						EMIId;
-		uint16						manufacturerCode;
-		uint8						dataSize;
-		uint8						data[256];
+		mutable uint64				m_index;
+		uint8						m_reportID;
+		bool						m_startPacket;
+		bool						m_endPacket;
+		bool						m_partialPacket;
+		uint8						m_sequenceNumber;
+		uint8						m_protocolVersion;
+		AHIDProtocolId				m_protocolId;
+		uint8						m_EMIId;
+		uint16						m_manufacturerCode;
+		uint8						m_dataSize;
+		uint8						m_data[256];
 
 		void						SetIndex(uint64 index) const;
 
@@ -34,7 +34,7 @@ class AHIDReport
 
 		void						SetReportID(uint8 id);
 		uint8						GetReportID() const;
-		
+
 		void						SetStartPacket(bool flag);
 		bool						GetStartPacket() const;
 		void						SetEndPacket(bool flag);
