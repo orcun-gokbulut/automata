@@ -7,50 +7,50 @@
 void AGroupAddress::SetA(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part A part is too big.");
-	a = value;
+	m_a = value;
 }
 
 uint8 AGroupAddress::GetA() const
 {
-	return a;
+	return m_a;
 }
 
 void AGroupAddress::SetB(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part B part is too big.");
-	b = value;
+	m_b = value;
 }
 
 uint8 AGroupAddress::GetB() const
 {
-	return b;
+	return m_b;
 }
 
 void AGroupAddress::SetC(uint8 value)
 {
-	c = value;
+	m_c = value;
 }
 
 uint8 AGroupAddress::GetC() const
 {
-	return c;
+	return m_c;
 }
 
 void AGroupAddress::SetRaw(uint16 value)
 {
-	raw = value;
+	m_raw = value;
 }
 
 uint16 AGroupAddress::GetRaw() const
 {
-	return raw;
+	return m_raw;
 }
 
 bool AGroupAddress::SetString(const char* value)
 {
 	regex re(R"(^\s*([0-9]+)\s*\/\s*([0-9]+)\s*\/\s*([0-9]+)\s*$)");
 	smatch match;
-	
+
 	string valueStr = value;
 	bool result = regex_match(valueStr, match, re);
 	CheckError(!result, false, "Cannot set address. Invalid address format.");
@@ -61,33 +61,33 @@ bool AGroupAddress::SetString(const char* value)
 
 	CheckError(ta >= 32 || tb >= 8 || tc >= 256, false, "Cannot set address. One or more of the address part(s) is too big.");
 
-	a = ta;
-	b = tb;
-	c = tc;
+	m_a = ta;
+	m_b = tb;
+	m_c = tc;
 
 	return true;
 }
 
 string AGroupAddress::GetString() const
 {
-	return std::to_string(a) + "/" + std::to_string(b) + "/" + std::to_string(c);
+	return std::to_string(m_a) + "/" + std::to_string(m_b) + "/" + std::to_string(m_c);
 }
 
 bool AGroupAddress::operator==(const AGroupAddress& other) const
 {
-	return raw == other.raw;
+	return m_raw == other.m_raw;
 }
 
 bool AGroupAddress::operator!=(const AGroupAddress& other) const
 {
-	return raw != other.raw;
+	return m_raw != other.m_raw;
 }
 
 
 AGroupAddress::AGroupAddress()
 {
-	byte[0] = 0x00;
-	byte[1] = 0x00;
+	m_byte[0] = 0x00;
+	m_byte[1] = 0x00;
 }
 
 AGroupAddress::AGroupAddress(const char* value)
@@ -102,9 +102,9 @@ AGroupAddress::AGroupAddress(uint16 raw)
 
 AGroupAddress::AGroupAddress(uint8 a, uint8 b, uint8 c)
 {
-	this->a = a;
-	this->b = b;
-	this->c = c;
+	this->m_a = a;
+	this->m_b = b;
+	this->m_c = c;
 }
 
 
@@ -114,43 +114,43 @@ AGroupAddress::AGroupAddress(uint8 a, uint8 b, uint8 c)
 void AIndividualAddress::SetA(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part A part is too big.");
-	a = value;
+	m_a = value;
 }
 
 uint8 AIndividualAddress::GetA() const
 {
-	return a;
+	return m_a;
 }
 
 void AIndividualAddress::SetB(uint8 value)
 {
 	CheckError(value >= 16, RETURN_VOID, "Cannot set address. Address part B part is too big.");
-	b = value;
+	m_b = value;
 }
 
 uint8 AIndividualAddress::GetB() const
 {
-	return b;
+	return m_b;
 }
 
 void AIndividualAddress::SetC(uint8 value)
 {
-	c = value;
+	m_c = value;
 }
 
 uint8 AIndividualAddress::GetC() const
 {
-	return c;
+	return m_c;
 }
 
 void AIndividualAddress::SetRaw(uint16 value)
 {
-	raw = value;
+	m_raw = value;
 }
 
 uint16 AIndividualAddress::GetRaw() const
 {
-	return raw;
+	return m_raw;
 }
 
 bool AIndividualAddress::SetString(const char* value)
@@ -168,33 +168,33 @@ bool AIndividualAddress::SetString(const char* value)
 
 	CheckError(ta >= 16 || tb >= 16 || tc >= 256, false, "Cannot set address. One or more of the address part(s) is too big.");
 
-	a = ta;
-	b = tb;
-	c = tc;
+	m_a = ta;
+	m_b = tb;
+	m_c = tc;
 
 	return true;
 }
 
 string AIndividualAddress::GetString() const
 {
-	return std::to_string(a) + "." + std::to_string(b) + "." + std::to_string(c);
+	return std::to_string(m_a) + "." + std::to_string(m_b) + "." + std::to_string(m_c);
 }
 
 bool AIndividualAddress::operator==(const AIndividualAddress& other) const
 {
-	return raw == other.raw;
+	return m_raw == other.m_raw;
 }
 
 bool AIndividualAddress::operator!=(const AIndividualAddress& other) const
 {
-	return raw != other.raw;
+	return m_raw != other.m_raw;
 }
 
 
 AIndividualAddress::AIndividualAddress()
 {
-	byte[0] = 0x00;
-	byte[1] = 0x00;
+	m_byte[0] = 0x00;
+	m_byte[1] = 0x00;
 }
 
 AIndividualAddress::AIndividualAddress(const char* value)
@@ -209,7 +209,7 @@ AIndividualAddress::AIndividualAddress(uint16 raw)
 
 AIndividualAddress::AIndividualAddress(uint8 a, uint8 b, uint8 c)
 {
-	this->a = a;
-	this->b = b;
-	this->c = c;
+	this->m_a = a;
+	this->m_b = b;
+	this->m_c = c;
 }

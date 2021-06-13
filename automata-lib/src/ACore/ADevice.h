@@ -12,12 +12,12 @@ class ADevice
 	friend class ACore;
 	friend class ADataPoint;
 	private:
-		ACore*								core;
-		uint32								serialNumber;
-		string								name;
-		bool								initialized;
+		ACore*								m_core;
+		uint32								m_serialNumber;
+		string								m_name;
+		bool								m_initialized;
 
-		std::vector<ADataPoint*>			dataPoints;
+		std::vector<ADataPoint*>			m_dataPoints;
 
 		void								DataPointChanged(const ADataPoint& dataPoint);
 
@@ -34,7 +34,7 @@ class ADevice
 
 		void								SetName(const string& name);
 		const char*							GetName() const;
-		
+
 		bool								IsInitialized();
 		virtual bool						Initialize();
 		virtual bool						Deinitialize();

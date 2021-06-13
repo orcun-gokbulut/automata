@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Service",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/run/automata-service",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "visualizerFile": "/home/orcun/.config/Code/User/workspaceStorage/b4cad81e76fe8b089256aa52cfb991b2/tonka3000.qtvsctools/qt.natvis.xml"
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Launch Configurator",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/output/automata-relay-configurator",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "visualizerFile": "/home/orcun/.config/Code/User/workspaceStorage/b4cad81e76fe8b089256aa52cfb991b2/tonka3000.qtvsctools/qt.natvis.xml"
+        }
+    ]
+}

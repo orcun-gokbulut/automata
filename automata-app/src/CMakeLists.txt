@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(Sources Main.cpp)
+list(APPEND Sources Main.cpp)
 
 add_executable(automata-app ${Sources})
 source_group("" FILES ${Sources})

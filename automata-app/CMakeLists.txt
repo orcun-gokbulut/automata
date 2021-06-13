@@ -1,16 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
-link_directories("../automata-lib/output/lib")
-include_directories("../automata-lib/output/include")
-
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif()
 
+include_directories(${CMAKE_SOURCE_DIR}/automata-lib/src)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/run")
 
 add_subdirectory(src)
 
-install(FILES tools/automata.service DESTINATION /lib/systemd/system)
+install(FILES share/automata.service DESTINATION /lib/systemd/system)

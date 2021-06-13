@@ -35,19 +35,20 @@ class ADataPoint
 {
 	friend class ADevice;
 	private:
-		ADevice*							device;
-		std::string							name;
-		AGroupAddress						address;
-		ADataPointType						type;
+		ADevice*							m_device;
+		std::string							m_name;
+		AGroupAddress						m_address;
+		ADataPointType						m_type;
 		union
 		{
-			uint64							integer;
-			double							double_;
-			bool							boolean;
-			char							string_[15];
+			uint64							m_integer;
+			double							m_double_;
+			bool							m_boolean;
+			char							m_string_[15];
 		} value;
 
-		bool								insideUpdateEvent;
+		bool								m_insideUpdateEvent;
+
 		ADataPointChangedCallback			OnChanged;
 		ADataPointUpdatedCallback			OnUpdated;
 

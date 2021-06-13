@@ -89,8 +89,8 @@ class ACEMIMessage
 {
 	private:
 		friend class ACore;
-		mutable uint64						index;
-		ACEMIMessageCode					messageCode;
+		mutable uint64						m_index;
+		ACEMIMessageCode					m_messageCode;
 
 		void								SetIndex(uint64 Index) const;
 
@@ -113,8 +113,8 @@ class ACEMIMessageGeneric : public ACEMIMessage
 {
 
 	private:
-		uint8								additionalInfo[256];
-		uint8								additionalInfoSize;
+		uint8								m_additionalInfo[256];
+		uint8								m_additionalInfoSize;
 
 	public:
 		void								SetAdditionalInfo(const void* data, uint8 size);
@@ -133,26 +133,26 @@ class ACEMIMessageGeneric : public ACEMIMessage
 class ACEMIMessageData : public ACEMIMessageGeneric
 {
 	private:
-		ACEMIFrameFormat					frameFormat;
-		bool								repeatFlag;
-		ACEMIBroadcastType					systemBroadcast;
-		ACEMIPriority						priority;
-		bool								acknowledgeRequestFlag;
-		bool								confirmFlag;
-		AAddressType						destAddressType;
-		uint8								hopCount;
-		uint8								extendedFrameFormat;
+		ACEMIFrameFormat					m_frameFormat;
+		bool								m_repeatFlag;
+		ACEMIBroadcastType					m_systemBroadcast;
+		ACEMIPriority						m_priority;
+		bool								m_acknowledgeRequestFlag;
+		bool								m_confirmFlag;
+		AAddressType						m_destAddressType;
+		uint8								m_hopCount;
+		uint8								m_extendedFrameFormat;
 
-		AIndividualAddress					source;
-		AGroupAddress						destinationGroup;
-		AIndividualAddress					destinationIndividual;
+		AIndividualAddress					m_source;
+		AGroupAddress						m_destinationGroup;
+		AIndividualAddress					m_destinationIndividual;
 
-		uint8								tpci;
-		ACEMIAPCI							apci;
+		uint8								m_tpci;
+		ACEMIAPCI							m_apci;
 
-		uint8								firstPayload;
-		uint8								payload[256];
-		uint8								payloadSize;
+		uint8								m_firstPayload;
+		uint8								m_payload[256];
+		uint8								m_payloadSize;
 
 	public:
 		void								SetFrameFormat(ACEMIFrameFormat format);
@@ -244,7 +244,7 @@ class ACEMIMessageData : public ACEMIMessageGeneric
 
 		virtual void						Generate(void* buffer, uint8& size) const;
 		virtual size_t						Process(const void* buffer, size_t size);
-		
+
 		void								Reset();
 
 		virtual std::string					ToString() const;

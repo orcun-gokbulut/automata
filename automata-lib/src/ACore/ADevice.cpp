@@ -7,32 +7,32 @@
 
 ACore* ADevice::GetCore() const
 {
-	return core;
+	return m_core;
 }
 
 void ADevice::SetSerialNumber(uint32 number)
 {
-	serialNumber = number;
+	m_serialNumber = number;
 }
 
 int ADevice::GetSerialNumber() const
 {
-	return serialNumber;
+	return m_serialNumber;
 }
 
 void ADevice::SetName(const string& name)
 {
-	this->name = name;
+	this->m_name = name;
 }
 
 const char* ADevice::GetName() const
 {
-	return name.c_str();
+	return m_name.c_str();
 }
 
 const std::vector<ADataPoint*>& ADevice::GetDataPoints() const
 {
-	return dataPoints;
+	return m_dataPoints;
 }
 
 void ADevice::RegisterDataPoint(ADataPoint* dataPoint)
@@ -43,8 +43,8 @@ void ADevice::RegisterDataPoint(ADataPoint* dataPoint)
 		GetName(),
 		dataPoint->GetName());
 
-	dataPoints.insert(dataPoints.end(), dataPoint);
-	dataPoint->device = this;
+	m_dataPoints.insert(m_dataPoints.end(), dataPoint);
+	dataPoint->m_device = this;
 }
 
 void ADevice::UnregisterDataPoint(ADataPoint* dataPoint)
@@ -55,25 +55,25 @@ void ADevice::UnregisterDataPoint(ADataPoint* dataPoint)
 		GetName(),
 		dataPoint->GetName());
 
-	dataPoints.erase(std::find(dataPoints.begin(), dataPoints.end(), dataPoint));
-	dataPoint->device = nullptr;
+	m_dataPoints.erase(std::find(m_dataPoints.begin(), m_dataPoints.end(), dataPoint));
+	dataPoint->m_device = nullptr;
 }
 
 bool ADevice::IsInitialized()
 {
-	return initialized;
+	return m_initialized;
 }
 
 bool ADevice::Initialize()
 {
-	initialized = true;
+	m_initialized = true;
 
 	return true;
 }
 
 bool ADevice::Deinitialize()
 {
-	initialized = false;
+	m_initialized = false;
 
 	return true;
 }
@@ -88,7 +88,7 @@ void ADevice::TelegramReceived(const ACEMIMessage& message)
 		dataMessage.GetAPCI() == ACEMIAPCI::GroupValueRead ||
 		dataMessage.GetAPCI() == ACEMIAPCI::GroupValueResponse)
 	{
-		for (auto iterator = dataPoints.begin(); iterator != dataPoints.end(); iterator++)
+		for (auto iterator = m_dataPoints.begin(); iterator != m_dataPoints.end(); iterator++)
 		{
 			ADataPoint* current = *iterator;
 			if (current->GetAddress().GetRaw() != 0x0000 && current->GetAddress() == dataMessage.GetDestinationGroup())
@@ -114,12 +114,12 @@ void ADevice::PostProcess()
 
 ADevice::ADevice()
 {
-	core = nullptr;
-	serialNumber = 0;
-	initialized = false;
+	m_core = nullptr;
+	m_serialNumber = 0;
+	m_initialized = false;
 }
 
 ADevice::~ADevice()
 {
-	CheckError(dataPoints.size() != 0, RETURN_VOID, "Cannot deconstruct Device. There still registered data points available. Device Name: %s.", GetName());
+	CheckError(m_dataPoints.size() != 0, RETURN_VOID, "Cannot deconstruct Device. There still registered data points available. Device Name: %s.", GetName());
 }

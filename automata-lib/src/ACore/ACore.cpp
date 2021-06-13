@@ -17,7 +17,7 @@ using namespace std;
 bool ACore::InitializeDevices()
 {
 	Log("Initializing devices.");
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
 
@@ -33,7 +33,7 @@ bool ACore::InitializeDevices()
 bool ACore::DeinitializeDevices()
 {
 	Log("Deinitializing devices.");
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
 
@@ -48,8 +48,8 @@ bool ACore::DeinitializeDevices()
 
 bool ACore::InitializeInterface()
 {
-	CheckError(interfaceDevice != NULL, false, "Cannot initialize interface. Interface is already intialized.");
-	
+	CheckError(m_interfaceDevice != NULL, false, "Cannot initialize interface. Interface is already intialized.");
+
 	if (hid_init())
 	{
 		RaiseError("Cannot initialize HID library.");
@@ -92,7 +92,7 @@ bool ACore::InitializeInterface()
 
 			vendorId = currentDeviceInfo->vendor_id;
 			productId = currentDeviceInfo->product_id;
-			
+
 			break;
 		}
 
@@ -103,8 +103,8 @@ bool ACore::InitializeInterface()
 	CheckError(productId == 0 && vendorId == 0, false, "Cannot initialize interface. No KNX USB Interface device has been found.");
 
 
-	interfaceDevice = hid_open(vendorId, productId, NULL);
-	CheckError(interfaceDevice == nullptr, false, "Cannot initialize interface. Cannot open interface device.");
+	m_interfaceDevice = hid_open(vendorId, productId, NULL);
+	CheckError(m_interfaceDevice == nullptr, false, "Cannot initialize interface. Cannot open interface device.");
 
 	//hid_set_nonblocking(interfaceDevice, 1);
 
@@ -122,10 +122,10 @@ bool ACore::InitializeInterface()
 	if ((supportedEMIs & 0x0004) != 0x0004)
 	{
 		RaiseError("Device does not support cEMI. Cannot initialize interface.");
-		hid_close(interfaceDevice);
+		hid_close(m_interfaceDevice);
 		return false;
 	}
-	
+
 	uint8 currentEMI = 0;
 	SendServiceQuery(0x01, 0x05, nullptr, 0, &currentEMI, 1);
 	Log("Active EMI : %s%s%s%s.",
@@ -137,7 +137,7 @@ bool ACore::InitializeInterface()
 	if (currentEMI != 0x03)
 	{
 		Log("Changing EMI to cEMI.");
-		
+
 		currentEMI = 0x03;
 		SendServiceCommand(0x03, 0x05, &currentEMI, 1);
 	}
@@ -169,10 +169,10 @@ bool ACore::InitializeInterface()
 
 bool ACore::DeinitializeInterface()
 {
-	CheckError(interfaceDevice != NULL, false, "Cannot deinitialize interface. Interface is already deinitialized.");
+	CheckError(m_interfaceDevice != NULL, false, "Cannot deinitialize interface. Interface is already deinitialized.");
 
-	hid_close(interfaceDevice);
-	interfaceDevice = nullptr;
+	hid_close(m_interfaceDevice);
+	m_interfaceDevice = nullptr;
 	hid_exit();
 
 	return true;
@@ -215,12 +215,12 @@ void ACore::SendServiceQuery(uint8 service, uint8 feature, const void* parameter
 
 const std::vector<ADevice*>& ACore::GetDevices() const
 {
-	return devices;
+	return m_devices;
 }
 
 ADevice* ACore::GetDevice(const char* Name) const
 {
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		if (strcmp((*iterator)->GetName(), Name) == 0)
 			return *iterator;
@@ -234,8 +234,8 @@ void ACore::AddDevice(ADevice* device)
 	CheckError(device == NULL, RETURN_VOID, "Cannot add device to core. Device is NULL.");
 	CheckError(device->GetCore() != nullptr, RETURN_VOID,"Cannot add device to core. Device is already added to a core. Device Name: %s.", device->GetName());
 
-	devices.insert(devices.end(), device);
-	device->core = this;
+	m_devices.insert(m_devices.end(), device);
+	device->m_core = this;
 
 	if (!device->IsInitialized())
 		device->Initialize();
@@ -249,38 +249,38 @@ void ACore::RemoveDevice(ADevice* device)
 	if (device->IsInitialized())
 		device->Deinitialize();
 
-	devices.erase(std::find(devices.begin(), devices.end(), device));
-	device->core = nullptr;
+	m_devices.erase(std::find(m_devices.begin(), m_devices.end(), device));
+	device->m_core = nullptr;
 }
 
 void ACore::SetAddress(const AIndividualAddress& address)
 {
-	this->address = address;
+	this->m_address = address;
 }
 
 const AIndividualAddress& ACore::GetAddress() const
 {
-	return address;
+	return m_address;
 }
 
 void ACore::SetPrintMessages(bool enabled)
 {
-	printMessages = enabled;
+	m_SettingsPrintMessages = enabled;
 }
 
 bool ACore::GetPrintMessages() const
 {
-	return printMessages;
+	return m_SettingsPrintMessages;
 }
 
 void ACore::SetPrintHIDPackets(bool enabled)
 {
-	printHIDPackets = enabled;
+	m_SettingsPrintHIDPackets = enabled;
 }
 
 bool ACore::GetPrintHIDPackets() const
 {
-	return printHIDPackets;
+	return m_SettingsPrintHIDPackets;
 }
 
 void ACore::QueryBusStatus()
@@ -292,19 +292,19 @@ void ACore::QueryBusStatus()
 
 bool ACore::GetBusStatus()
 {
-	return busStatus;
+	return m_busStatus;
 
 }
 
 bool ACore::IsInitialized()
 {
-	return initialized;
+	return m_initialized;
 }
 
 bool ACore::Initialize()
 {
 	Log("Initializing core...");
-	
+
 	if (!InitializeInterface())
 	{
 		RaiseError("Core initialization has failed.");
@@ -313,12 +313,12 @@ bool ACore::Initialize()
 
 	InitializeDevices();
 
-	initialized = true;
+	m_initialized = true;
 
 	Log("Core initialized.");
 
-	if (initializationCallback != nullptr)
-		initializationCallback(this);
+	if (m_initializationCallback != nullptr)
+		m_initializationCallback(this);
 
 	return true;
 }
@@ -327,13 +327,13 @@ bool ACore::Deinitialize()
 {
 	Log("Deinitializing core...");
 
-	if (deinitializationCallback != nullptr)
-		deinitializationCallback(this);
+	if (m_deinitializationCallback != nullptr)
+		m_deinitializationCallback(this);
 
 	DeinitializeDevices();
 	DeinitializeInterface();
 
-	initialized = false;
+	m_initialized = false;
 
 	Log("Core deinitialized.");
 
@@ -342,13 +342,13 @@ bool ACore::Deinitialize()
 
 void ACore::DispatchHIDReport(const AHIDReport& report)
 {
-	if (!initialized)
+	if (!m_initialized)
 		return;
 	if (report.GetProtocolId() == AHIDProtocolId::BusAccessServerFeatureService)
 	{
 		if (report.GetEMIId() == 0x04 && report.GetDataSize() == 2 && *(uint8*)report.GetData() == 0x03)
 		{
-			busStatus = (bool)((uint8*)report.GetData())[1];
+			m_busStatus = (bool)((uint8*)report.GetData())[1];
 		}
 	}
 	else if (report.GetProtocolId() == AHIDProtocolId::KNXTunnel)
@@ -369,7 +369,7 @@ void ACore::DispatchHIDReport(const AHIDReport& report)
 
 				dataMessage.SetIndex(index);
 
-				if (printMessages)
+				if (m_SettingsPrintMessages)
 					cout << "INCOMMING " << dataMessage.ToString();
 
 				DispatchMessage(dataMessage);
@@ -387,7 +387,7 @@ void ACore::DispatchHIDReport(const AHIDReport& report)
 
 				propertyMessage.SetIndex(index);
 
-				if (printMessages)
+				if (m_SettingsPrintMessages)
 					cout << "INCOMMING " << propertyMessage.ToString();
 
 				break;
@@ -398,13 +398,13 @@ void ACore::DispatchHIDReport(const AHIDReport& report)
 
 void ACore::DispatchMessage(const ACEMIMessage& message)
 {
-	if (!initialized)
+	if (!m_initialized)
 		return;
 
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
-		
+
 		if (!currentDevice->IsInitialized())
 			continue;
 
@@ -422,10 +422,10 @@ bool ACore::SendHIDReport(const AHIDReport& report)
 	report.Generate(packetBuffer, size);
 	report.SetIndex(index);
 
-	if (printHIDPackets)
+	if (m_SettingsPrintHIDPackets)
 		cout << "OUTGOING " << report.ToString();
 
-	int bytesSend = hid_write(interfaceDevice, packetBuffer, size);
+	int bytesSend = hid_write(m_interfaceDevice, packetBuffer, size);
 	CheckError(bytesSend < size, false, "Cannot send packet.");
 
 	return true;
@@ -435,18 +435,18 @@ bool ACore::ReceiveHIDReport(AHIDReport& report, uint32 timeout)
 {
 	uint8 buffer[1024];
 	uint8* cursor = buffer;
-	int bytesReceived = hid_read_timeout(interfaceDevice, buffer, 1024, timeout);
+	int bytesReceived = hid_read_timeout(m_interfaceDevice, buffer, 1024, timeout);
 	if (bytesReceived == 0)
 		return false;
-	
+
 	if (!report.Process(buffer, bytesReceived))
 		return false;
-	
+
 	static uint64 index = 0;
 	index++;
 	report.SetIndex(index);
 
-	if (printHIDPackets)
+	if (m_SettingsPrintHIDPackets)
 		cout << "INCOMMING " << report.ToString();
 
 	return true;
@@ -464,7 +464,7 @@ bool ACore::SendMessage(const ACEMIMessage& message)
 	message.Generate(buffer, size);
 	message.SetIndex(index);
 
-	if (printMessages)
+	if (m_SettingsPrintMessages)
 		cout << "OUTGOING " << message.ToString();
 
 	AHIDReport report;
@@ -476,10 +476,10 @@ void ACore::Process()
 {
 	CheckError(!IsInitialized(), RETURN_VOID, "Cannot process core. Core is not initialized.");
 
-	if (preLoopCallback != nullptr)
-		preLoopCallback(this);
+	if (m_preLoopCallback != nullptr)
+		m_preLoopCallback(this);
 
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
 		if (!currentDevice->IsInitialized())
@@ -492,7 +492,7 @@ void ACore::Process()
 	if (ReceiveHIDReport(packet))
 		DispatchHIDReport(packet);
 
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 	{
 		ADevice* currentDevice = (*iterator);
 		if (!currentDevice->IsInitialized())
@@ -501,8 +501,8 @@ void ACore::Process()
 		currentDevice->PostProcess();
 	}
 
-	if (postLoopCallback != nullptr)
-		postLoopCallback(this);
+	if (m_postLoopCallback != nullptr)
+		m_postLoopCallback(this);
 }
 
 void ACore::Execute()
@@ -515,50 +515,50 @@ void ACore::Execute()
 
 void ACore::SetInitializationCallback(const ACoreInitializedCallback& callback)
 {
-	initializationCallback = callback;
+	m_initializationCallback = callback;
 }
 
 const ACoreInitializedCallback& ACore::GetInitializationCallback() const
 {
-	return initializationCallback;
+	return m_initializationCallback;
 }
 
 void ACore::SetDeinitializationCallback(const ACoreDeinitializedCallback& callback)
 {
-	deinitializationCallback = callback;
+	m_deinitializationCallback = callback;
 }
 
 const ACoreDeinitializedCallback& ACore::GetDeinitializationCallback() const
 {
-	return deinitializationCallback;
+	return m_deinitializationCallback;
 }
 
 void ACore::SetPreLoopCallback(const ACorePreLoopCallback& callback)
 {
-	preLoopCallback = callback;
+	m_preLoopCallback = callback;
 }
 
 const ACorePreLoopCallback& ACore::GetPreLoopCallback() const
 {
-	return preLoopCallback;
+	return m_preLoopCallback;
 }
 
 void ACore::SetPostLoopCallback(const ACorePostLoopCallback& callback)
 {
-	postLoopCallback = callback;
+	m_postLoopCallback = callback;
 }
 
 const ACorePostLoopCallback& ACore::GetPostLoopCallback() const
 {
-	return postLoopCallback;
+	return m_postLoopCallback;
 }
 
 ACore::ACore()
 {
-	interfaceDevice = nullptr;
-	initialized = false;
-	printMessages = false;
-	printHIDPackets = false;
+	m_interfaceDevice = nullptr;
+	m_initialized = false;
+	m_SettingsPrintMessages = false;
+	m_SettingsPrintHIDPackets = false;
 }
 
 ACore::~ACore()
@@ -566,6 +566,6 @@ ACore::~ACore()
 	if (IsInitialized())
 		Deinitialize();
 
-	for (auto iterator = devices.begin(); iterator != devices.end(); iterator++)
+	for (auto iterator = m_devices.begin(); iterator != m_devices.end(); iterator++)
 		delete *iterator;
 }

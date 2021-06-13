@@ -7,11 +7,8 @@ list(APPEND Headers ADeviceRelay.h)
 list(APPEND Sources ADeviceRelay.cpp)
 
 add_library(ADevices STATIC ${Headers} ${Sources})
+source_group("" FILES ${Sources})
 target_link_libraries(ADevices libhttp)
 
-get_property(Sources TARGET ADevices PROPERTY SOURCES)
-source_group("" FILES ${Sources})
-
-install(TARGETS ADevices ARCHIVE DESTINATION lib)
-get_target_property(HEADERS ACore INTERFACE_SOURCES)
 install(FILES ${Headers} DESTINATION include/ADevices)
+install(TARGETS ADevices ARCHIVE DESTINATION lib)

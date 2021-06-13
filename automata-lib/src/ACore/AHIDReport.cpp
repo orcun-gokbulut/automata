@@ -146,49 +146,49 @@ uint16 AHIDReport::GetManufacturerCode() const
 void AHIDReport::Generate(void* buffer, uint8& size) const
 {
 	size = 0;
-	
+
 	AHIDReportHeader* header = (AHIDReportHeader*)buffer;
-	header->reportID = GetReportID();
-	header->startPacket = GetStartPacket();
-	header->endPacket = GetEndPacket();
-	header->partialPacket = GetPartialPacket();
-	header->reserved = 0;
-	header->sequenceNumber = GetSequenceNumber();
-	header->dataLength = 8 + GetDataSize();
+	header->m_reportID = GetReportID();
+	header->m_startPacket = GetStartPacket();
+	header->m_endPacket = GetEndPacket();
+	header->m_partialPacket = GetPartialPacket();
+	header->m_reserved = 0;
+	header->m_sequenceNumber = GetSequenceNumber();
+	header->m_dataLength = 8 + GetDataSize();
 	size += sizeof(AHIDReportHeader);
 
 	AHIDReportBody* body = (AHIDReportBody*)((uint8*)buffer + size);
-	body->protocolVersion = GetProtocolVersion();
-	body->headerLength = 8;
-	body->bodyLenght = bswap_16((uint16)GetDataSize());
-	body->EMIId = GetEMIId();
-	body->protocolId = (uint8)GetProtocolId();
-	body->manufacturerCode = GetManufacturerCode();
+	body->m_protocolVersion = GetProtocolVersion();
+	body->m_headerLength = 8;
+	body->m_bodyLenght = bswap_16((uint16)GetDataSize());
+	body->m_EMIId = GetEMIId();
+	body->m_protocolId = (uint8)GetProtocolId();
+	body->m_manufacturerCode = GetManufacturerCode();
 	size += sizeof(AHIDReportBody);
 
 	void* data = (uint8*)buffer + size;
 	memcpy(data, GetData(), GetDataSize());
-	
+
 	size += GetDataSize();
 }
 
 bool AHIDReport::Process(const void* buffer, uint8 size)
 {
 	AHIDReportHeader* header = (AHIDReportHeader*)buffer;
-	SetReportID(header->reportID);
-	SetStartPacket(header->startPacket);
-	SetEndPacket(header->endPacket);
-	SetPartialPacket(header->partialPacket);
-	SetSequenceNumber(header->sequenceNumber);
+	SetReportID(header->m_reportID);
+	SetStartPacket(header->m_startPacket);
+	SetEndPacket(header->m_endPacket);
+	SetPartialPacket(header->m_partialPacket);
+	SetSequenceNumber(header->m_sequenceNumber);
 
 	AHIDReportBody* body = (AHIDReportBody*)((uint8*)buffer + sizeof(AHIDReportHeader));
-	SetProtocolVersion(body->protocolVersion);
-	SetProtocolId((AHIDProtocolId)body->protocolId);
-	SetEMIId(body->EMIId);
-	SetManufacturerCode(body->manufacturerCode);
+	SetProtocolVersion(body->m_protocolVersion);
+	SetProtocolId((AHIDProtocolId)body->m_protocolId);
+	SetEMIId(body->m_EMIId);
+	SetManufacturerCode(body->m_manufacturerCode);
 
 	uint8* dataBuffer = (uint8*)body + sizeof(AHIDReportBody);
-	SetData(dataBuffer, bswap_16(body->bodyLenght));
+	SetData(dataBuffer, bswap_16(body->m_bodyLenght));
 
 	return true;
 }
@@ -252,10 +252,10 @@ std::string AHIDReport::ToString() const
 			break;
 	}
 	output << "\n";
-	
+
 	output << "  Manufacturer Code: " << std::to_string((int)manufacturerCode) << "\n";
 	output << "  Data Size: " << (int)dataSize << "\n";
-	
+
 	output << "  Data: ";
 	for (uint8 i = 0; i < dataSize; i++)
 	{

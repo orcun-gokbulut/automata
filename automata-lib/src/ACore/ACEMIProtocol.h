@@ -22,38 +22,38 @@ struct ACEMIPacketHeaderGeneric
 struct ACEMIDataPacketControl
 {
 	// Control 1
-	bool					confirmFlag : 1;
-	bool					acknowledgeRequestFlag : 1;
-	uint8					priority : 2;
-	uint8					systemBroadcast : 1;
-	bool					repeatFlag : 1;
-	uint8					reserved : 1;
-	uint8					frameFormat : 1;
-	
+	bool					m_confirmFlag : 1;
+	bool					m_acknowledgeRequestFlag : 1;
+	uint8					m_priority : 2;
+	uint8					m_systemBroadcast : 1;
+	bool					m_repeatFlag : 1;
+	uint8					m_reserved : 1;
+	uint8					m_frameFormat : 1;
+
 	// Control 2
-	uint8					extendedFrameFormat : 4;
-	uint8					hopCount : 3;
-	uint8					destinationAddresType : 1;
+	uint8					m_extendedFrameFormat : 4;
+	uint8					m_hopCount : 3;
+	uint8					m_destinationAddresType : 1;
 };
 
 struct ACEMIPacketData
 {
-	ACEMIDataPacketControl	control;
-	uint16					source;
-	uint16					destination;
-	uint8					length;
-	uint8					tapci0;
-	uint8					tapci1;
+	ACEMIDataPacketControl	m_control;
+	uint16					m_source;
+	uint16					m_destination;
+	uint8					m_length;
+	uint8					m_tapci0;
+	uint8					m_tapci1;
 };
 
 struct ACEMIPacketProperty
 {
-	uint16					interfaceObjectType;
-	uint8					objectInstance;
-	uint8					propertyId;
-	uint8					arraySize : 4;
-	uint8					arrayIndexH : 4;
-	uint8					arrayIndexL;
+	uint16					m_interfaceObjectType;
+	uint8					m_objectInstance;
+	uint8					m_propertyId;
+	uint8					m_arraySize : 4;
+	uint8					m_arrayIndexH : 4;
+	uint8					m_arrayIndexL;
 };
 
 #pragma pack(pop)

@@ -22,12 +22,12 @@ class AGroupAddress
 		{
 			struct
 			{
-				uint8			b : 3;
-				uint8			a : 5;
-				uint8			c : 8;
+				uint8			m_b : 3;
+				uint8			m_a : 5;
+				uint8			m_c : 8;
 			};
-			uint8				byte[2];
-			uint16				raw;
+			uint8				m_byte[2];
+			uint16				m_raw;
 		};
 
 	public:
@@ -62,12 +62,12 @@ class AIndividualAddress
 		{
 			struct
 			{
-				uint8			b : 4;
-				uint8			a : 4;
-				uint8			c : 8;
+				uint8			m_b : 4;
+				uint8			m_a : 4;
+				uint8			m_c : 8;
 			};
-			uint8				byte[2];
-			uint16				raw;
+			uint8				m_byte[2];
+			uint16				m_raw;
 		};
 
 	public:

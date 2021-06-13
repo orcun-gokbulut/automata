@@ -13,22 +13,22 @@
 
 void ACEMIMessage::SetIndex(uint64 index) const
 {
-	this->index = index;
+	this->m_index = index;
 }
 
 uint64 ACEMIMessage::GetIndex() const
 {
-	return index;
+	return m_index;
 }
 
 void ACEMIMessage::SetMessageCode(ACEMIMessageCode code)
 {
-	messageCode = code;
+	m_messageCode = code;
 }
 
 ACEMIMessageCode ACEMIMessage::GetMessageCode() const
 {
-	return messageCode;
+	return m_messageCode;
 }
 
 void ACEMIMessage::Generate(void* buffer, uint8& size) const
@@ -49,7 +49,7 @@ size_t ACEMIMessage::Process(const void* buffer, size_t size)
 std::string ACEMIMessage::ToString() const
 {
 	stringstream output;
-	output << "cEMI Message #" << index << "\n";
+	output << "cEMI Message #" << m_index << "\n";
 
 	output << "  Message Code: ";
 	switch (GetMessageCode())
@@ -57,7 +57,7 @@ std::string ACEMIMessage::ToString() const
 		case ACEMIMessageCode::DataReceived:
 			output << "Data Received";
 			break;
-		
+
 		case ACEMIMessageCode::DataTransmitRequest:
 			output << "Data Transmit Request";
 			break;
@@ -96,8 +96,8 @@ std::string ACEMIMessage::ToString() const
 
 ACEMIMessage::ACEMIMessage()
 {
-	index = 0;
-	messageCode = ACEMIMessageCode::DataTransmitRequest;
+	m_index = 0;
+	m_messageCode = ACEMIMessageCode::DataTransmitRequest;
 }
 
 ACEMIMessage::~ACEMIMessage()
@@ -112,18 +112,18 @@ ACEMIMessage::~ACEMIMessage()
 void ACEMIMessageGeneric::SetAdditionalInfo(const void* data, uint8 size)
 {
 	if (size != 0)
-		memcpy(additionalInfo, data, size);
-	additionalInfoSize = size;
+		memcpy(m_additionalInfo, data, size);
+	m_additionalInfoSize = size;
 }
 
 const void* ACEMIMessageGeneric::GetAdditionalInfo() const
 {
-	return additionalInfo;
+	return m_additionalInfo;
 }
 
 uint8 ACEMIMessageGeneric::GetAdditionalInfoSize() const
 {
-	return additionalInfoSize;
+	return m_additionalInfoSize;
 }
 
 void ACEMIMessageGeneric::Generate(void* buffer, uint8& size) const
@@ -176,8 +176,8 @@ std::string ACEMIMessageGeneric::ToString() const
 
 ACEMIMessageGeneric::ACEMIMessageGeneric()
 {
-	memset(additionalInfo, 0, sizeof(additionalInfo));
-	additionalInfoSize = 0;
+	memset(m_additionalInfo, 0, sizeof(m_additionalInfo));
+	m_additionalInfoSize = 0;
 }
 
 ACEMIMessageGeneric::~ACEMIMessageGeneric()
@@ -191,298 +191,298 @@ ACEMIMessageGeneric::~ACEMIMessageGeneric()
 
 void ACEMIMessageData::SetFrameFormat(ACEMIFrameFormat format)
 {
-	frameFormat = format;
+	m_frameFormat = format;
 }
 
 ACEMIFrameFormat ACEMIMessageData::GetFrameFormat() const
 {
-	return frameFormat;
+	return m_frameFormat;
 }
 
 void ACEMIMessageData::SetRepeatFlag(bool flag)
 {
-	repeatFlag = flag;
+	m_repeatFlag = flag;
 }
 
 bool ACEMIMessageData::GetRepeatFlag() const
 {
-	return repeatFlag;
+	return m_repeatFlag;
 }
 
 void ACEMIMessageData::SetBroadcastType(ACEMIBroadcastType type)
 {
-	systemBroadcast = type;
+	m_systemBroadcast = type;
 }
 
 ACEMIBroadcastType ACEMIMessageData::GetBroadcastType() const
 {
-	return systemBroadcast;
+	return m_systemBroadcast;
 }
 
 void ACEMIMessageData::SetPriority(ACEMIPriority priority)
 {
-	this->priority = priority;
+	this->m_priority = priority;
 }
 
 ACEMIPriority ACEMIMessageData::GetPriority() const
 {
-	return priority;
+	return m_priority;
 }
 
 void ACEMIMessageData::SetAcknowledgeRequestFlag(bool flag)
 {
-	acknowledgeRequestFlag = flag;
+	m_acknowledgeRequestFlag = flag;
 }
 
 bool ACEMIMessageData::GetAcknowledgeRequestFlag() const
 {
-	return acknowledgeRequestFlag;
+	return m_acknowledgeRequestFlag;
 }
 
 void ACEMIMessageData::SetConfirmFlag(bool flag)
 {
-	confirmFlag = flag;
+	m_confirmFlag = flag;
 }
 
 bool ACEMIMessageData::GetConfirmFlag() const
 {
-	return confirmFlag;
+	return m_confirmFlag;
 }
 
 void ACEMIMessageData::SetHopCount(uint8 count)
 {
-	hopCount = count;
+	m_hopCount = count;
 }
 
 uint8 ACEMIMessageData::GetHopCount() const
 {
-	return hopCount;
+	return m_hopCount;
 }
 
 void ACEMIMessageData::SetExtendedFrameFormat(uint8 format)
 {
-	extendedFrameFormat = format;
+	m_extendedFrameFormat = format;
 }
 
 uint8 ACEMIMessageData::GetExtendedFrameFormat() const
 {
-	return extendedFrameFormat;
+	return m_extendedFrameFormat;
 }
 
 void ACEMIMessageData::SetAddressType(AAddressType type)
 {
-	destAddressType = type;
+	m_destAddressType = type;
 }
 
 AAddressType ACEMIMessageData::GetAddressType() const
 {
-	return destAddressType;
+	return m_destAddressType;
 }
 
 void ACEMIMessageData::SetSource(const AIndividualAddress& address)
 {
-	source = address;
+	m_source = address;
 }
 
 const AIndividualAddress& ACEMIMessageData::GetSource() const
 {
-	return source;
+	return m_source;
 }
 
 void ACEMIMessageData::SetDestinationIndividual(const AIndividualAddress& address)
 {
-	destinationIndividual = address;
+	m_destinationIndividual = address;
 }
 
 const AIndividualAddress& ACEMIMessageData::GetDestinationInduvidual() const
 {
-	return destinationIndividual;
+	return m_destinationIndividual;
 }
 
 void ACEMIMessageData::SetDestinationGroup(const AGroupAddress& address)
 {
-	destinationGroup = address;
+	m_destinationGroup = address;
 }
 
 const AGroupAddress& ACEMIMessageData::GetDestinationGroup() const
 {
-	return destinationGroup;
+	return m_destinationGroup;
 }
 
 void ACEMIMessageData::SetTPCI(uint8 value)
 {
-	tpci = value;
+	m_tpci = value;
 }
 
 uint8 ACEMIMessageData::GetTPCI() const
 {
-	return tpci;
+	return m_tpci;
 }
 
 void ACEMIMessageData::SetAPCI(ACEMIAPCI value)
 {
-	apci = value;
+	m_apci = value;
 }
 
 ACEMIAPCI ACEMIMessageData::GetAPCI() const
 {
-	return apci;
+	return m_apci;
 }
 
 void ACEMIMessageData::SetFirstPayload(uint8 payload)
 {
-	firstPayload = payload;
+	m_firstPayload = payload;
 }
 
 uint8 ACEMIMessageData::GetFirstPayload() const
 {
-	return firstPayload;
+	return m_firstPayload;
 }
 
 void ACEMIMessageData::SetPayload(const void* data, uint8 size)
 {
 	if (data == nullptr || size == 0)
 	{
-		memset(payload, 0, sizeof(payload));
+		memset(m_payload, 0, sizeof(m_payload));
 	}
 	else
 	{
-		memset(payload + size, 0, sizeof(payload) - size);
-		memcpy(payload, data, size);
+		memset(m_payload + size, 0, sizeof(m_payload) - size);
+		memcpy(m_payload, data, size);
 	}
 
-	payloadSize = size;
+	m_payloadSize = size;
 }
 
 const void* ACEMIMessageData::GetPayload() const
 {
-	return payload;
+	return m_payload;
 }
 
 uint8 ACEMIMessageData::GetPayloadSize() const
 {
-	return payloadSize;
+	return m_payloadSize;
 }
 
 void ACEMIMessageData::SetUInt8(uint8 value)
 {
-	*(uint8*)payload = value;
-	payloadSize = 1;
+	*(uint8*)m_payload = value;
+	m_payloadSize = 1;
 }
 
 uint8 ACEMIMessageData::GetUInt8() const
 {
-	return *(int8*)payload;
+	return *(int8*)m_payload;
 }
 
 void ACEMIMessageData::SetUInt16(uint16 value)
 {
-	*(uint16*)payload = bswap_16(value);
-	payloadSize = 2;
+	*(uint16*)m_payload = bswap_16(value);
+	m_payloadSize = 2;
 }
 
 uint16 ACEMIMessageData::GetUInt16() const
 {
-	return bswap_16(*(int16*)payload);
+	return bswap_16(*(int16*)m_payload);
 }
 
 void ACEMIMessageData::SetUInt32(uint32 value)
 {
-	*(uint32*)payload = bswap_32(value);
-	payloadSize = 4;
+	*(uint32*)m_payload = bswap_32(value);
+	m_payloadSize = 4;
 }
 
 uint32 ACEMIMessageData::GetUInt32() const
 {
-	return bswap_32(*(uint32*)payload);
+	return bswap_32(*(uint32*)m_payload);
 }
 
 void ACEMIMessageData::SetUInt64(uint64 value)
 {
-	*(uint64*)payload = bswap_64(value);
-	payloadSize = 8;
+	*(uint64*)m_payload = bswap_64(value);
+	m_payloadSize = 8;
 }
 
 uint64 ACEMIMessageData::GetUInt64() const
 {
-	return bswap_64(*(uint64*)payload);
+	return bswap_64(*(uint64*)m_payload);
 }
 
 void ACEMIMessageData::SetInt8(int8 value)
 {
-	*(int8*)payload = value;
-	payloadSize = 1;
+	*(int8*)m_payload = value;
+	m_payloadSize = 1;
 }
 
 int8 ACEMIMessageData::GetInt8() const
 {
-	return *(int8*)payload;
+	return *(int8*)m_payload;
 }
 
 void ACEMIMessageData::SetInt16(int16 value)
 {
-	*(int16*)payload = (int16)bswap_16(value);
-	payloadSize = 2;
+	*(int16*)m_payload = (int16)bswap_16(value);
+	m_payloadSize = 2;
 }
 
 int16 ACEMIMessageData::GetInt16() const
 {
-	return (int16)bswap_16(*(int16*)payload);
+	return (int16)bswap_16(*(int16*)m_payload);
 }
 
 void ACEMIMessageData::SetInt32(int32 value)
 {
-	*(int32*)payload = (int32)bswap_32(value);
-	payloadSize = 4;
+	*(int32*)m_payload = (int32)bswap_32(value);
+	m_payloadSize = 4;
 }
 
 int32 ACEMIMessageData::GetInt32() const
 {
-	return (int32)bswap_32(*(int32*)payload);
+	return (int32)bswap_32(*(int32*)m_payload);
 }
 
 void ACEMIMessageData::SetInt64(int64 value)
 {
-	*(int64*)payload = (int64)bswap_64(value);
-	payloadSize = 8;
+	*(int64*)m_payload = (int64)bswap_64(value);
+	m_payloadSize = 8;
 }
 
 int64 ACEMIMessageData::GetInt64() const
 {
-	return (int64)bswap_64(*(int64*)payload);
+	return (int64)bswap_64(*(int64*)m_payload);
 }
 
 void ACEMIMessageData::SetHalfFloat(float value)
 {
-	*(uint16*)payload = toHalf(value);
-	payloadSize = 2;
+	*(uint16*)m_payload = toHalf(value);
+	m_payloadSize = 2;
 }
 
 float ACEMIMessageData::GetHalfFloat() const
 {
-	return toFloat(*(uint16*)payload);
+	return toFloat(*(uint16*)m_payload);
 }
 
 void ACEMIMessageData::SetFloat(float value)
 {
-	*(float*)payload = value;
-	payloadSize = 4;
+	*(float*)m_payload = value;
+	m_payloadSize = 4;
 }
 
 float ACEMIMessageData::GetFloat() const
 {
-	return *(float*)payload;
+	return *(float*)m_payload;
 }
 
 void ACEMIMessageData::SetDouble(double value)
 {
-	*(double*)payload = value;
-	payloadSize = 8;
+	*(double*)m_payload = value;
+	m_payloadSize = 8;
 }
 
 double ACEMIMessageData::GetDouble() const
 {
-	return *(double*)payload;
+	return *(double*)m_payload;
 }
 
 void ACEMIMessageData::SetBoolean(bool value)
@@ -492,7 +492,7 @@ void ACEMIMessageData::SetBoolean(bool value)
 
 bool ACEMIMessageData::GetBoolean() const
 {
-	return (bool)firstPayload;
+	return (bool)m_firstPayload;
 }
 
 uint8 ACEMIMessageData::GetSize() const
@@ -505,37 +505,37 @@ void ACEMIMessageData::Generate(void* buffer, uint8& size) const
 	ACEMIMessageGeneric::Generate(buffer, size);
 
 	ACEMIPacketData* packet = (ACEMIPacketData*)((uint8*)buffer + size);
-	packet->control.frameFormat = (uint8)GetFrameFormat();
-	packet->control.reserved = 0;
-	packet->control.repeatFlag = GetRepeatFlag();
-	packet->control.systemBroadcast = (uint8)GetBroadcastType();
-	packet->control.priority = (uint8)GetPriority();
-	packet->control.acknowledgeRequestFlag = GetAcknowledgeRequestFlag();
-	packet->control.confirmFlag = GetConfirmFlag();
-	packet->control.destinationAddresType = (uint8)GetAddressType();
-	packet->control.hopCount = GetHopCount();
-	packet->control.extendedFrameFormat = GetExtendedFrameFormat();
-	packet->source = source.GetRaw();
+	packet->m_control.m_frameFormat = (uint8)GetFrameFormat();
+	packet->m_control.m_reserved = 0;
+	packet->m_control.m_repeatFlag = GetRepeatFlag();
+	packet->m_control.m_systemBroadcast = (uint8)GetBroadcastType();
+	packet->m_control.m_priority = (uint8)GetPriority();
+	packet->m_control.m_acknowledgeRequestFlag = GetAcknowledgeRequestFlag();
+	packet->m_control.m_confirmFlag = GetConfirmFlag();
+	packet->m_control.m_destinationAddresType = (uint8)GetAddressType();
+	packet->m_control.m_hopCount = GetHopCount();
+	packet->m_control.m_extendedFrameFormat = GetExtendedFrameFormat();
+	packet->m_source = m_source.GetRaw();
 	if (GetAddressType() == AAddressType::IndividualAddress)
-		packet->destination = destinationIndividual.GetRaw();
+		packet->m_destination = m_destinationIndividual.GetRaw();
 	else
-		packet->destination = destinationGroup.GetRaw();
+		packet->m_destination = m_destinationGroup.GetRaw();
 
-	packet->length = payloadSize + 1;
-	packet->tapci0 = tpci << 2 | ((uint16)apci & 0x0300);
-	packet->tapci1 = ((uint16)apci & 0x00FF);
-	
+	packet->m_length = m_payloadSize + 1;
+	packet->m_tapci0 = m_tpci << 2 | ((uint16)m_apci & 0x0300);
+	packet->m_tapci1 = ((uint16)m_apci & 0x00FF);
+
 	ACEMIAPCI trimmedACPI = GetAPCI();
 	if (trimmedACPI == ACEMIAPCI::GroupValueRead || trimmedACPI == ACEMIAPCI::GroupValueWrite || trimmedACPI == ACEMIAPCI::GroupValueResponse)
-		packet->tapci1 = packet->tapci1 | GetFirstPayload();
+		packet->m_tapci1 = packet->m_tapci1 | GetFirstPayload();
 
 	size += sizeof(ACEMIPacketData);
 
 	uint8* bytes = (uint8*)buffer;
-	if (payloadSize != 0)
-		memcpy(bytes + size, payload, payloadSize);
+	if (m_payloadSize != 0)
+		memcpy(bytes + size, m_payload, m_payloadSize);
 
-	size += payloadSize;
+	size += m_payloadSize;
 }
 
 size_t ACEMIMessageData::Process(const void* buffer, size_t size)
@@ -545,17 +545,17 @@ size_t ACEMIMessageData::Process(const void* buffer, size_t size)
 		return 0;
 
 	const ACEMIPacketData* message = (const ACEMIPacketData*)((const uint8*)buffer + offset);
-	SetFrameFormat((ACEMIFrameFormat)message->control.frameFormat);
-	SetRepeatFlag(message->control.repeatFlag);
-	SetBroadcastType((ACEMIBroadcastType)message->control.systemBroadcast);
-	SetPriority((ACEMIPriority)message->control.priority);
-	SetAcknowledgeRequestFlag(message->control.acknowledgeRequestFlag);
-	SetConfirmFlag(message->control.confirmFlag);
-	SetAddressType((AAddressType)message->control.destinationAddresType);
-	SetHopCount(message->control.hopCount);
-	SetExtendedFrameFormat(message->control.extendedFrameFormat);
-	SetTPCI((message->tapci0 & 0xFC) >> 2);
-	SetSource(message->source);
+	SetFrameFormat((ACEMIFrameFormat)message->m_control.m_frameFormat);
+	SetRepeatFlag(message->m_control.m_repeatFlag);
+	SetBroadcastType((ACEMIBroadcastType)message->m_control.m_systemBroadcast);
+	SetPriority((ACEMIPriority)message->m_control.m_priority);
+	SetAcknowledgeRequestFlag(message->m_control.m_acknowledgeRequestFlag);
+	SetConfirmFlag(message->m_control.m_confirmFlag);
+	SetAddressType((AAddressType)message->m_control.m_destinationAddresType);
+	SetHopCount(message->m_control.m_hopCount);
+	SetExtendedFrameFormat(message->m_control.m_extendedFrameFormat);
+	SetTPCI((message->m_tapci0 & 0xFC) >> 2);
+	SetSource(message->m_source);
 
 	if (GetAPCI() == ACEMIAPCI::GroupValueRead || GetAPCI() == ACEMIAPCI::GroupValueResponse || GetAPCI() == ACEMIAPCI::GroupValueWrite)
 		SetAddressType(AAddressType::GroupAddress);
@@ -563,12 +563,12 @@ size_t ACEMIMessageData::Process(const void* buffer, size_t size)
 		SetAddressType(AAddressType::IndividualAddress);
 
 	if (GetAddressType() == AAddressType::IndividualAddress)
-		SetDestinationIndividual(message->destination);
+		SetDestinationIndividual(message->m_destination);
 	else
-		SetDestinationGroup(message->destination);
+		SetDestinationGroup(message->m_destination);
 	offset += sizeof(ACEMIPacketData);
 
-	uint16 rawACPI = (uint16)((message->tapci0 & 0x03) << 8) | message->tapci1;
+	uint16 rawACPI = (uint16)((message->m_tapci0 & 0x03) << 8) | message->m_tapci1;
 	ACEMIAPCI trimmedACPI = (ACEMIAPCI)(rawACPI & 0x03C0);
 	if (trimmedACPI == ACEMIAPCI::GroupValueRead || trimmedACPI == ACEMIAPCI::GroupValueWrite || trimmedACPI == ACEMIAPCI::GroupValueResponse)
 	{
@@ -581,10 +581,10 @@ size_t ACEMIMessageData::Process(const void* buffer, size_t size)
 		SetFirstPayload(0);
 	}
 
-	if (message->length != 0)
+	if (message->m_length != 0)
 	{
-		SetPayload((const uint8*)buffer + offset, message->length - 1);
-		offset += message->length - 1;
+		SetPayload((const uint8*)buffer + offset, message->m_length - 1);
+		offset += message->m_length - 1;
 	}
 	else
 	{
@@ -596,20 +596,20 @@ size_t ACEMIMessageData::Process(const void* buffer, size_t size)
 
 void ACEMIMessageData::Reset()
 {
-	frameFormat = ACEMIFrameFormat::Standard;
-	repeatFlag = false;
-	systemBroadcast = ACEMIBroadcastType::Broadcast;
-	priority = ACEMIPriority::Normal;
-	acknowledgeRequestFlag = false;
-	confirmFlag = false;
-	destAddressType = AAddressType::GroupAddress;
-	hopCount = 0;
-	extendedFrameFormat = 0;
-	firstPayload = 0;
-	payloadSize = 0;
-	tpci = 0x00;
-	apci = ACEMIAPCI::GroupValueWrite;
-	memset(payload, 0, sizeof(payload));
+	m_frameFormat = ACEMIFrameFormat::Standard;
+	m_repeatFlag = false;
+	m_systemBroadcast = ACEMIBroadcastType::Broadcast;
+	m_priority = ACEMIPriority::Normal;
+	m_acknowledgeRequestFlag = false;
+	m_confirmFlag = false;
+	m_destAddressType = AAddressType::GroupAddress;
+	m_hopCount = 0;
+	m_extendedFrameFormat = 0;
+	m_firstPayload = 0;
+	m_payloadSize = 0;
+	m_tpci = 0x00;
+	m_apci = ACEMIAPCI::GroupValueWrite;
+	memset(m_payload, 0, sizeof(m_payload));
 }
 
 std::string ACEMIMessageData::ToString() const
@@ -653,17 +653,17 @@ std::string ACEMIMessageData::ToString() const
 	output << "  Address Type : " << (GetAddressType() == AAddressType::IndividualAddress ? "Individual" : "Group") << "\n";
 	output << "  Hop Count: " << std::to_string(GetHopCount()) << "\n";
 	output << "  Extended Frame Format: " << std::to_string(GetExtendedFrameFormat()) << "\n";
-	output << "  Source : " << source.GetString() << "\n";
+	output << "  Source : " << m_source.GetString() << "\n";
 	if (GetAddressType() == AAddressType::IndividualAddress)
-		output << "  Destination : " << destinationIndividual.GetString() << "\n";
+		output << "  Destination : " << m_destinationIndividual.GetString() << "\n";
 	else
-		output << "  Destination : " << destinationGroup.GetString() << "\n";
+		output << "  Destination : " << m_destinationGroup.GetString() << "\n";
 
-	toHex(tpci, hexOutput);
+	toHex(m_tpci, hexOutput);
 	output << "  TPCI: " << hexOutput << "\n";
 
 	output << "  APCI: ";
-	switch (apci)
+	switch (m_apci)
 	{
 		case ACEMIAPCI::GroupValueRead:
 			output << "GroupValueRead";
@@ -809,21 +809,21 @@ std::string ACEMIMessageData::ToString() const
 			output << "UNKNOWN";
 			break;
 	}
-	
-	toHex16((uint16)apci, hexOutput);
+
+	toHex16((uint16)m_apci, hexOutput);
 	output << " (0x" << hexOutput << ")\n";
 
 	toHex(GetFirstPayload(), hexOutput);
 	output << "  First Payload: 0x" << hexOutput << "\n";
 	output << "  Payload Size: " << std::to_string((uint8)GetPayloadSize()) << "\n";
-	if (payloadSize != 0)
+	if (m_payloadSize != 0)
 	{
 		output << "  Payload : ";
 		output << std::hex;
-		for (size_t i = 0; i < payloadSize; i++)
+		for (size_t i = 0; i < m_payloadSize; i++)
 		{
 			char hexOutput[3];
-			toHex(payload[i], hexOutput);
+			toHex(m_payload[i], hexOutput);
 			output << hexOutput << " ";
 		}
 		output << "\n";
@@ -927,23 +927,23 @@ bool ACEMIMessageProperty::GetRequestArraySize() const
 void ACEMIMessageProperty::Generate(void* buffer, uint8& size) const
 {
 	ACEMIMessage::Generate(buffer, size);
-	
+
 	ACEMIPacketProperty* packet = (ACEMIPacketProperty*)((uint8*)buffer + size);
-	packet->interfaceObjectType = bswap_16(GetInterfaceObjectType());
-	packet->objectInstance = GetObjectInstance();
-	packet->propertyId = GetPropertyId();
+	packet->m_interfaceObjectType = bswap_16(GetInterfaceObjectType());
+	packet->m_objectInstance = GetObjectInstance();
+	packet->m_propertyId = GetPropertyId();
 
 	if (requestArraySize)
 	{
-		packet->arraySize = 1;
-		packet->arrayIndexH = 0;
-		packet->arrayIndexL = 0;
+		packet->m_arraySize = 1;
+		packet->m_arrayIndexH = 0;
+		packet->m_arrayIndexL = 0;
 	}
 	else
 	{
-		packet->arraySize = GetArraySize();
-		packet->arrayIndexH = GetArrayStartIndex() >> 8;
-		packet->arrayIndexL = GetArraySize() & 0xFF;
+		packet->m_arraySize = GetArraySize();
+		packet->m_arrayIndexH = GetArrayStartIndex() >> 8;
+		packet->m_arrayIndexL = GetArraySize() & 0xFF;
 
 		if (GetMessageCode() == ACEMIMessageCode::PropertyReadConfirmation ||
 			GetMessageCode() == ACEMIMessageCode::PropertyWriteRequest)
@@ -961,11 +961,11 @@ size_t ACEMIMessageProperty::Process(const void* buffer, size_t size)
 	size_t offset = ACEMIMessage::Process(buffer, size);
 
 	ACEMIPacketProperty* packet = (ACEMIPacketProperty*)((uint8*)buffer + offset);
-	SetInterfaceObjectType(bswap_16(packet->interfaceObjectType));
-	SetObjectInstance(packet->objectInstance);
-	SetPropertyId(packet->propertyId);
-	SetArraySize(packet->arraySize);
-	SetArrayStartIndex(packet->arrayIndexH << 8 | packet->arrayIndexL);
+	SetInterfaceObjectType(bswap_16(packet->m_interfaceObjectType));
+	SetObjectInstance(packet->m_objectInstance);
+	SetPropertyId(packet->m_propertyId);
+	SetArraySize(packet->m_arraySize);
+	SetArrayStartIndex(packet->m_arrayIndexH << 8 | packet->m_arrayIndexL);
 	offset += sizeof(ACEMIPacketProperty);
 
 	if (GetArraySize() == 0)
@@ -996,7 +996,7 @@ std::string ACEMIMessageProperty::ToString() const
 	stringstream output;
 
 	output << ACEMIMessage::ToString();
-	
+
 	output << "  <Property>" << "\n";
 	output << "  Interface Object Type: " << std::to_string(GetInterfaceObjectType()) << "\n";
 	output << "  Object Instance: " << std::to_string(GetObjectInstance()) << "\n";

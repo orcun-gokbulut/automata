@@ -16,9 +16,8 @@ list(APPEND Headers AError.h)
 list(APPEND Sources AError.cpp)
 
 add_library(ACommon STATIC ${Headers} ${Sources})
-target_link_libraries(ACommon libhalf)
 source_group("" FILES ${Headers} ${Sources})
+target_link_libraries(ACommon libhalf)
 
 install(TARGETS ACommon ARCHIVE DESTINATION lib)
-get_target_property(HEADERS ACore INTERFACE_SOURCES)
 install(FILES ${Headers} DESTINATION include/ACommon)

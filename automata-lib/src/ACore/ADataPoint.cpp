@@ -2,7 +2,6 @@
 
 #include "ACore/ACore.h"
 #include "ACore/ADevice.h"
-#include "ACore/ADataPoint.h"
 #include "ACore/ACEMIMessage.h"
 
 #include "ACommon/AError.h"
@@ -13,7 +12,7 @@
 
 ADevice* ADataPoint::GetDevice() const
 {
-	return device;
+	return m_device;
 }
 
 ACore* ADataPoint::GetCore() const
@@ -26,54 +25,54 @@ ACore* ADataPoint::GetCore() const
 
 void ADataPoint::SetName(const char* name)
 {
-	this->name = name;
+	this->m_name = name;
 }
 
 const char* ADataPoint::GetName() const
 {
-	return name.c_str();
+	return m_name.c_str();
 }
 
 std::string ADataPoint::GetPath() const
 {
-	if (device != nullptr)
-		return device->GetName() + std::string("::") + GetName();
+	if (m_device != nullptr)
+		return m_device->GetName() + std::string("::") + GetName();
 	else
 		return GetName();
 }
 
 void ADataPoint::SetAddress(AGroupAddress address)
 {
-	this->address = address;
+	this->m_address = address;
 }
 
 const AGroupAddress& ADataPoint::GetAddress() const
 {
-	return address;
+	return m_address;
 }
 
 void ADataPoint::SetType(ADataPointType type)
 {
-	this->type = type;
+	this->m_type = type;
 }
 
 ADataPointType ADataPoint::GetType()
 {
-	return type;
+	return m_type;
 }
 
 bool ADataPoint::IsNull() const
 {
-	return type == ADataPointType::Null;
+	return m_type == ADataPointType::Null;
 }
 
 void ADataPoint::SetUInt8(uint8 value)
 {
-	CheckError(type != ADataPointType::UInt8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::UInt8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = value;
+	this->value.m_integer = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -84,18 +83,18 @@ void ADataPoint::SetUInt8(uint8 value)
 
 uint8 ADataPoint::GetUInt8() const
 {
-	CheckError(type != ADataPointType::UInt8, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::UInt8, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (uint8)value.integer;
+	return (uint8)value.m_integer;
 }
 
-void ADataPoint::SetUInt16(uint16 value) 
+void ADataPoint::SetUInt16(uint16 value)
 {
-	CheckError(type != ADataPointType::UInt16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::UInt16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = value;
+	this->value.m_integer = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -106,18 +105,18 @@ void ADataPoint::SetUInt16(uint16 value)
 
 uint16 ADataPoint::GetUInt16() const
 {
-	CheckError(type != ADataPointType::UInt16, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::UInt16, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (uint16)value.integer;
+	return (uint16)value.m_integer;
 }
 
 void ADataPoint::SetUInt32(uint32 value)
 {
-	CheckError(type != ADataPointType::UInt32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::UInt32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = value;
+	this->value.m_integer = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -128,18 +127,18 @@ void ADataPoint::SetUInt32(uint32 value)
 
 uint32 ADataPoint::GetUInt32() const
 {
-	CheckError(type != ADataPointType::UInt32, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::UInt32, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (uint32)value.integer;
+	return (uint32)value.m_integer;
 }
 
 void ADataPoint::SetUInt64(uint64 value)
 {
-	CheckError(type != ADataPointType::UInt64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::UInt64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = value;
+	this->value.m_integer = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -150,18 +149,18 @@ void ADataPoint::SetUInt64(uint64 value)
 
 uint64 ADataPoint::GetUInt64() const
 {
-	CheckError(type != ADataPointType::UInt64, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::UInt64, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return value.integer;
+	return value.m_integer;
 }
 
 void ADataPoint::SetInt8(int8 value)
 {
-	CheckError(type != ADataPointType::Int8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Int8, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	this->value.integer = (uint64)value;
+	this->value.m_integer = (uint64)value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -172,18 +171,18 @@ void ADataPoint::SetInt8(int8 value)
 
 int8 ADataPoint::GetInt8() const
 {
-	CheckError(type != ADataPointType::Int8, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Int8, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (int8)value.integer;
+	return (int8)value.m_integer;
 }
 
 void ADataPoint::SetInt16(int16 value)
 {
-	CheckError(type != ADataPointType::Int16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Int16, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = (uint64)value;
+	this->value.m_integer = (uint64)value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -194,18 +193,18 @@ void ADataPoint::SetInt16(int16 value)
 
 int16 ADataPoint::GetInt16() const
 {
-	CheckError(type != ADataPointType::Int16, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Int16, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (int16)value.integer;
+	return (int16)value.m_integer;
 }
 
 void ADataPoint::SetInt32(int32 value)
 {
-	CheckError(type != ADataPointType::Int32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Int32, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = (uint64)value;
+	this->value.m_integer = (uint64)value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -216,18 +215,18 @@ void ADataPoint::SetInt32(int32 value)
 
 int32 ADataPoint::GetInt32() const
 {
-	CheckError(type != ADataPointType::Int32, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Int32, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (int32)value.integer;
+	return (int32)value.m_integer;
 }
 
 void ADataPoint::SetInt64(int64 value)
 {
-	CheckError(type != ADataPointType::Int64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Int64, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.integer = (uint64)value;
+	this->value.m_integer = (uint64)value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -238,18 +237,18 @@ void ADataPoint::SetInt64(int64 value)
 
 int64 ADataPoint::GetInt64() const
 {
-	CheckError(type != ADataPointType::Int64, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Int64, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (int64)value.integer;
+	return (int64)value.m_integer;
 }
 
 void ADataPoint::SetHalfFloat(float value)
 {
-	CheckError(type != ADataPointType::HalfFloat, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::HalfFloat, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.double_ = value;
+	this->value.m_double_ = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -260,16 +259,16 @@ void ADataPoint::SetHalfFloat(float value)
 
 float ADataPoint::GetHalfFloat() const
 {
-	return (float)value.double_;
+	return (float)value.m_double_;
 }
 
 void ADataPoint::SetFloat(float value)
 {
-	CheckError(type != ADataPointType::Float, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Float, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.double_ = (double)value;
+	this->value.m_double_ = (double)value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -280,18 +279,18 @@ void ADataPoint::SetFloat(float value)
 
 float ADataPoint::GetFloat()
 {
-	CheckError(type != ADataPointType::Float, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Float, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return (float)value.double_;
+	return (float)value.m_double_;
 }
 
 void ADataPoint::SetDouble(double value)
 {
-	CheckError(type != ADataPointType::Float, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Float, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.double_ = value;
+	this->value.m_double_ = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -302,18 +301,18 @@ void ADataPoint::SetDouble(double value)
 
 double ADataPoint::GetDouble() const
 {
-	CheckError(type != ADataPointType::Float, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Float, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return value.double_;
+	return value.m_double_;
 }
 
 void ADataPoint::SetBoolean(bool value)
 {
-	CheckError(type != ADataPointType::Boolean, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::Boolean, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 
-	this->value.boolean = value;
+	this->value.m_boolean = value;
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -324,20 +323,20 @@ void ADataPoint::SetBoolean(bool value)
 
 bool ADataPoint::GetBoolean() const
 {
-	CheckError(type != ADataPointType::Boolean, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
+	CheckError(m_type != ADataPointType::Boolean, 0, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
 
-	return value.boolean;
+	return value.m_boolean;
 }
 
 void ADataPoint::SetString(const char* value)
 {
-	CheckError(type != ADataPointType::String, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->type, type);
+	CheckError(m_type != ADataPointType::String, RETURN_VOID, "Setting OHDataPoint value is failed. Type Mismatch. Type: %d, Set Type: %d.", this->m_type, m_type);
 	CheckError(value == nullptr, RETURN_VOID, "Setting OHDataPoint value is failed. String is NULL.");
 	CheckError(strlen(value) > 14, RETURN_VOID, "Setting OHDataPoint value is failed. String value length is too big. Length: %d.", strlen(value));
 
-	strcpy(this->value.string_, value);
+	strcpy(this->value.m_string_, value);
 
-	if (!insideUpdateEvent)
+	if (!m_insideUpdateEvent)
 	{
 		if (OnChanged != nullptr)
 			OnChanged(*this);
@@ -348,9 +347,9 @@ void ADataPoint::SetString(const char* value)
 
 const char* ADataPoint::GetString()
 {
-	CheckError(type != ADataPointType::String, nullptr, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->type, type);
-	
-	return value.string_;
+	CheckError(m_type != ADataPointType::String, nullptr, "Getting DataPoint value is failed. Type Mismatch. DataPoint: %s, Type: %d, Set Type: %d.", GetPath().c_str(), this->m_type, m_type);
+
+	return value.m_string_;
 }
 
 void ADataPoint::SetOnChanged(ADataPointChangedCallback callback)
@@ -383,14 +382,14 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 
 		case ADataPointType::UInt8:
 			CheckError(message.GetPayloadSize() != sizeof(uint8), RETURN_VOID,
-				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: UInt8, Received Size: %u.", 
+				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: UInt8, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetUInt8(message.GetUInt8());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::UInt16:
@@ -398,11 +397,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: UInt16, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetUInt16(message.GetUInt16());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::UInt32:
@@ -410,11 +409,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: UInt32, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetUInt32(message.GetUInt32());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::UInt64:
@@ -422,11 +421,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: UInt64, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetUInt64(message.GetUInt64());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Int8:
@@ -434,11 +433,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Int8, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetInt8(message.GetInt8());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Int16:
@@ -446,23 +445,23 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Int16, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetInt16(message.GetInt16());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Int32:
 			CheckError(message.GetPayloadSize() != sizeof(int32), RETURN_VOID,
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Int32, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
-			
-			insideUpdateEvent = true;
+
+			m_insideUpdateEvent = true;
 			SetInt32(message.GetInt32());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Int64:
@@ -470,11 +469,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Int64, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetInt64(message.GetInt64());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::HalfFloat:
@@ -482,11 +481,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Float, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetHalfFloat(message.GetHalfFloat());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Float:
@@ -494,10 +493,10 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Float, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetFloat(message.GetFloat());
 			OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Double:
@@ -505,11 +504,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Double, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetDouble(message.GetDouble());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::Boolean:
@@ -517,11 +516,11 @@ void ADataPoint::Process(const ACEMIMessageData& message)
 				"Cannot update Datapoint. Type size mismatch. DataPoint %s, Type: Boolean, Received Size: %u.",
 				GetPath().c_str(), message.GetPayloadSize());
 
-			insideUpdateEvent = true;
+			m_insideUpdateEvent = true;
 			SetBoolean(message.GetBoolean());
 			if (OnUpdated != nullptr)
 				OnUpdated(*this, message);
-			insideUpdateEvent = false;
+			m_insideUpdateEvent = false;
 			break;
 
 		case ADataPointType::String:
@@ -537,7 +536,7 @@ void ADataPoint::Generate(ACEMIMessageData& message)
 
 	message.SetAddressType(AAddressType::GroupAddress);
 	message.SetAPCI(ACEMIAPCI::GroupValueWrite);
-	message.SetDestinationGroup(address);
+	message.SetDestinationGroup(m_address);
 
 	switch (GetType())
 	{
@@ -613,14 +612,14 @@ void ADataPoint::SendUpdate()
 
 ADataPoint::ADataPoint()
 {
-	device = nullptr;
-	type = ADataPointType::Null;
-	insideUpdateEvent = false;
+	m_device = nullptr;
+	m_type = ADataPointType::Null;
+	m_insideUpdateEvent = false;
 	memset(&value, 0, sizeof(value));
 }
 
 ADataPoint::~ADataPoint()
 {
-	if (device != nullptr)
-		device->UnregisterDataPoint(this);
+	if (m_device != nullptr)
+		m_device->UnregisterDataPoint(this);
 }

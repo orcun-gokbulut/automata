@@ -11,27 +11,27 @@ class AHIDReport;
 
 struct hid_device_;
 
-#define ACoreInitializedCallback std::function<void (ACore* core)> 
-#define ACoreDeinitializedCallback std::function<void (ACore* core)> 
-#define ACorePreLoopCallback std::function<void (ACore* core)> 
-#define ACorePostLoopCallback std::function<void (ACore* core)> 
+#define ACoreInitializedCallback std::function<void (ACore* core)>
+#define ACoreDeinitializedCallback std::function<void (ACore* core)>
+#define ACorePreLoopCallback std::function<void (ACore* core)>
+#define ACorePostLoopCallback std::function<void (ACore* core)>
 
 class ACore
 {
 	private:
-		AIndividualAddress					address;
-		std::vector<ADevice*>				devices;
-		hid_device_*						interfaceDevice;
-		bool								busStatus;
-		bool								printHIDPackets;
-		bool								printMessages;
+		AIndividualAddress					m_address;
+		std::vector<ADevice*>				m_devices;
+		hid_device_*						m_interfaceDevice;
+		bool								m_busStatus;
+		bool								m_SettingsPrintHIDPackets;
+		bool								m_SettingsPrintMessages;
 
-		bool								initialized;
+		bool								m_initialized;
 
-		ACoreInitializedCallback			initializationCallback;
-		ACoreDeinitializedCallback			deinitializationCallback;
-		ACorePreLoopCallback				preLoopCallback;
-		ACorePostLoopCallback				postLoopCallback;
+		ACoreInitializedCallback			m_initializationCallback;
+		ACoreDeinitializedCallback			m_deinitializationCallback;
+		ACorePreLoopCallback				m_preLoopCallback;
+		ACorePostLoopCallback				m_postLoopCallback;
 
 		bool								InitializeDevices();
 		bool								DeinitializeDevices();
